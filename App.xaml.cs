@@ -1,0 +1,40 @@
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+using QWellApp.DBConnection;
+using QWellApp.Views.Pages;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+
+namespace QWell
+{
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
+    {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            //DatabaseFacade facade = new DatabaseFacade(new AppDataContext());
+            //facade.EnsureCreated();
+        }
+
+        protected  void ApplicationStart(object sender, StartupEventArgs e)
+        {
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
+            loginWindow.IsVisibleChanged += (s, ev) =>
+            {
+                if (loginWindow.IsVisible == false && loginWindow.IsLoaded)
+                {
+                    var mainWindow = new MainWindow();
+                    loginWindow.Close();
+                }
+            };
+        }
+    }
+}

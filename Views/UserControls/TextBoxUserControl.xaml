@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="QWellApp.UserControls.TextBoxUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QWellApp.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Name="textBoxUserControl">
+    
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="MyBoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <TextBlock Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686" IsHitTestVisible="False" Panel.ZIndex="1"
+                   Visibility="{Binding ElementName=textBox, Converter={StaticResource MyBoolToVisibilityConverter}}" />
+        <TextBox Name="textBox" IsTabStop="False" Text="{Binding Path=Text,ElementName=textBoxUserControl}" Style="{StaticResource normalTextBox}"/>
+    </Grid>
+</UserControl>

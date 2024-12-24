@@ -1,0 +1,210 @@
+﻿<UserControl x:Class="QWellApp.Views.UserControls.SummaryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QWellApp.Views.UserControls"
+             xmlns:uc="clr-namespace:QWellApp.UserControls"
+             xmlns:viewModel="clr-namespace:QWellApp.ViewModels"
+             xmlns:converter="clr-namespace:QWellApp.Helpers"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             MouseDown="Window_MouseDown"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <viewModel:SummaryViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converter:StringToBoolConverter x:Key="StringToBoolConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <Grid x:Name="SupplierListView">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 0 0 0" Text="Start Date: " Style="{StaticResource text}"/>
+                    <DatePicker Name="CommissionStartDate" Grid.Column="1" Width="150"  Grid.Row="0" Foreground="Black" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
+                    <TextBlock Grid.Column="2" Grid.Row="0" Margin="0 0 0 0" Text="End Date: " Style="{StaticResource text}"/>
+                    <DatePicker Name="CommissionEndDate" Grid.Column="3" Width="150"  Grid.Row="0" Foreground="Black" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
+                    <Button Grid.Column="5" Grid.Row="0"
+                    Style="{StaticResource commandButton}"
+                    Content="Generate Report"
+                    Tag="{StaticResource color2}"
+                    Command="{Binding LoadReportResults}">
+                        <Button.Visibility>
+                            <Binding Path="GenerateReportButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                        </Button.Visibility>
+                    </Button>
+                    <Button Grid.Column="6" Grid.Row="0" 
+                            Content="Download Full Summary" 
+                            Style="{StaticResource commandButton}"
+                            Click="DownloadFullReportButton_Click" 
+                            Tag="{StaticResource color6}">
+                        <Button.Visibility>
+                            <Binding Path="DownloadButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                        </Button.Visibility>
+                    </Button>
+                </Grid>
+                <TextBlock Grid.Row="1" Width="250" HorizontalAlignment="Left" Margin="0 0 0 0" Text="Medical Records Summary" Style="{StaticResource text}"/>
+                <Button Grid.Row="1" 
+                        Width="210"
+                        HorizontalAlignment="Left"
+                    Margin="250,0,0,0"
+                    Content="Download Medical Summary" 
+                    Style="{StaticResource commandButton}"
+                    Click="DownloadMedicalReportButton_Click" 
+                    Tag="{StaticResource color11}">
+                    <Button.Visibility>
+                        <Binding Path="DownloadButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                    </Button.Visibility>
+                </Button>
+                <Border Grid.Row="2"
+                    Background="{StaticResource panelActiveColor}"
+                    CornerRadius="10" 
+                    Padding="5"
+                    Margin="0 10">
+                    <DataGrid
+                        Name="SummaryGridMed"
+                        CanUserAddRows="False"
+                        Style="{StaticResource tableGrid}"
+                        ItemsSource="{Binding MedicalSummaryList}"
+                        IsReadOnly="true"
+                        SelectionMode="Single"
+                        AutoGenerateColumns="False"
+                        RowDetailsVisibilityMode="Visible">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="40" Header="Id" Binding="{Binding Id}" />
+                            <DataGridTextColumn Width="100" Header="Chit Number" Binding="{Binding ChitNumber}" />
+                            <DataGridTextColumn Width="140" Header="Admit Date" Binding="{Binding AdmitDate}" />
+                            <DataGridTextColumn Header="OPD Charge" Binding="{Binding OPDCharge}" />
+                            <DataGridTextColumn Width="100" Header="Pharmacy Bill" Binding="{Binding PharmacyBill}" />
+                            <DataGridTextColumn Header="Consultant Fee" Binding="{Binding ConsultantFee}" />
+                            <DataGridTextColumn Header="Other Charges" Binding="{Binding OtherCharges}" />
+                            <DataGridTextColumn Header="Total Commissions" Binding="{Binding TotalCommisions}"/>
+                            <DataGridTextColumn Header="Total Bill" Binding="{Binding TotalBill}" />
+                        </DataGrid.Columns>
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridHeaderStyle1}"/>
+                        </DataGrid.Resources>
+                    </DataGrid>
+                </Border>
+                <Grid Grid.Row="2">
+                    <TextBlock x:Name="NoResultMed" Margin="100" HorizontalAlignment="Center" Text="No Results Found!" Visibility="{Binding NoResultsMed}"/>
+                </Grid>
+                <TextBlock Grid.Row="3" Width="250" HorizontalAlignment="Left" Margin="0 0 0 0" Text="Lab Records Summary" Style="{StaticResource text}"/>
+                <Button Grid.Row="3" 
+                    Width="210"
+                    HorizontalAlignment="Left"
+                    Margin="250,0,0,0"
+                    Content="Download Lab Summary" 
+                    Style="{StaticResource commandButton}"
+                    Click="DownloadLabReportButton_Click" 
+                    Tag="{StaticResource color2}">
+                    <Button.Visibility>
+                        <Binding Path="DownloadButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                    </Button.Visibility>
+                </Button>
+                <Border Grid.Row="4"
+                    Background="{StaticResource panelActiveColor}"
+                    CornerRadius="10" 
+                    Padding="5"
+                    Margin="0 10">
+                    <DataGrid
+                        Name="SummaryGridLab"
+                        CanUserAddRows="False"
+                        Style="{StaticResource tableGrid}"
+                        ItemsSource="{Binding LabSummaryList}"
+                        IsReadOnly="true"
+                        SelectionMode="Single"
+                        AutoGenerateColumns="False"
+                        RowDetailsVisibilityMode="Visible">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="40" Header="Id" Binding="{Binding Id}"/>
+                            <DataGridTextColumn Width="100" Header="Chit Number" Binding="{Binding ChitNumber}" />
+                            <DataGridTextColumn Width="140" Header="Admit Date" Binding="{Binding AdmitDate}" />
+                            <DataGridTextColumn Header="Lab Bill" Binding="{Binding LabBill}" />
+                            <DataGridTextColumn Width="100" Header="Lab Paid Cost" Binding="{Binding LabPaidCost}" />
+                            <DataGridTextColumn Header="Consultant Fee" Binding="{Binding ConsultantFee}" />
+                            <DataGridTextColumn Header="Consumable Charges" Binding="{Binding ConsumableBill}" />
+                            <DataGridTextColumn Header="Total Commissions" Binding="{Binding TotalCommisions}"/>
+                            <DataGridTextColumn Header="Total Bill" Binding="{Binding TotalBill}" />
+                        </DataGrid.Columns>
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridHeaderStyle3}"/>
+                        </DataGrid.Resources>
+                    </DataGrid>
+                </Border>
+                <Grid Grid.Row="4">
+                    <TextBlock x:Name="NoResultLab" Margin="100" HorizontalAlignment="Center" Text="No Results Found!" Visibility="{Binding NoResultsLab}"/>
+                </Grid>
+                <TextBlock Grid.Row="5" Width="250" HorizontalAlignment="Left" Margin="0 0 0 0" Text="Procedure Records Summary" Style="{StaticResource text}"/>
+                <Button Grid.Row="5" 
+                    Width="210"
+                    HorizontalAlignment="Left"
+                    Margin="250,0,0,0"
+                    Content="Download Procedure Summary" 
+                    Style="{StaticResource commandButton}"
+                    Click="DownloadProcedureReportButton_Click" 
+                    Tag="{StaticResource color5}">
+                    <Button.Visibility>
+                        <Binding Path="DownloadButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                    </Button.Visibility>
+                </Button>
+                <Border Grid.Row="6"
+                    Background="{StaticResource panelActiveColor}"
+                    CornerRadius="10" 
+                    Padding="5"
+                    Margin="0 10">
+                    <DataGrid
+                        Name="SummaryGridPro"
+                        CanUserAddRows="False"
+                        Style="{StaticResource tableGrid}"
+                        ItemsSource="{Binding ProcedureSummaryList}"
+                        IsReadOnly="true"
+                        SelectionMode="Single"
+                        AutoGenerateColumns="False"
+                        RowDetailsVisibilityMode="Visible">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="40" Header="Id" Binding="{Binding Id}" />
+                            <DataGridTextColumn Width="100" Header="Chit Number" Binding="{Binding ChitNumber}" />
+                            <DataGridTextColumn Width="140" Header="Admit Date" Binding="{Binding AdmitDate}" />
+                            <DataGridTextColumn Header="OPD Charge" Binding="{Binding OPDCharge}" />
+                            <DataGridTextColumn Width="100" Header="Procedure Bill" Binding="{Binding ProcedureBill}" />
+                            <DataGridTextColumn Header="Consultant Fee" Binding="{Binding ConsultantFee}" />
+                            <DataGridTextColumn Header="Other Charges" Binding="{Binding OtherCharges}" />
+                            <DataGridTextColumn Header="Total Commissions" Binding="{Binding TotalCommisions}"/>
+                            <DataGridTextColumn Header="Total Bill" Binding="{Binding TotalBill}" />
+                        </DataGrid.Columns>
+                        <DataGrid.Resources>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridHeaderStyle2}"/>
+                        </DataGrid.Resources>
+                    </DataGrid>
+                </Border>
+                <Grid Grid.Row="6">
+                    <TextBlock x:Name="NoResultPro" Margin="100" HorizontalAlignment="Center" Text="No Results Found!" Visibility="{Binding NoResultsPro}"/>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

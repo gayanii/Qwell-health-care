@@ -1,0 +1,552 @@
+﻿<UserControl x:Class="QWellApp.Views.UserControls.LabRecordView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QWellApp.Views.UserControls"
+             xmlns:uc="clr-namespace:QWellApp.UserControls"
+             xmlns:viewModel="clr-namespace:QWellApp.ViewModels"
+             xmlns:converter="clr-namespace:QWellApp.Helpers"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             mc:Ignorable="d" 
+             MouseDown="Window_MouseDown"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <viewModel:LabRecordViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converter:StringToBoolConverter x:Key="StringToBoolConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid x:Name="LabRecordListView">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Top"
+                    Grid.Column="0">
+                    <fa:IconImage Icon="Search" Height="20" Width="20" Foreground="{StaticResource color12}"/>
+                    <TextBox 
+                        x:Name="SearchBox"
+                        Text="{Binding SearchWord, UpdateSourceTrigger=PropertyChanged}"
+                        FontSize="13"
+                        Height="36"
+                        Width="300"
+                        Background="Transparent"
+                         FontWeight="Medium"
+                         FontFamily="Montserrat"                            
+                         Foreground="{StaticResource color12}"
+                         CaretBrush="{StaticResource color12}"
+                         BorderBrush="{StaticResource color12}"
+                         BorderThickness="0,0,0,2"                             
+                         VerticalContentAlignment="Center"
+                         Margin="5,5,0,0"></TextBox>
+                </StackPanel>
+                <!--<Button Grid.Column="1"
+                    Style="{StaticResource commandButton}"
+                    Command="{Binding LoadSearchResults}" 
+                    Content="Search"
+                    Tag="{StaticResource color6}">
+                </Button>-->
+                <Button Grid.Column="2"
+                    Style="{StaticResource commandButton}"
+                    Content="Update"
+                    Tag="{StaticResource color16}"
+                    Command="{Binding GetLabRecordDetails}"
+                    Click="UpdateButtonClicked">
+                    <Button.Visibility>
+                        <Binding Path="UpdateButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                    </Button.Visibility>
+                </Button>
+                <Button Grid.Column="3"
+                    Style="{StaticResource commandButton}"
+                    Content="Create New"
+                    Tag="{StaticResource color2}"
+                    Click="CreateButtonClicked">
+                    <Button.Visibility>
+                        <Binding Path="CreateButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                    </Button.Visibility>
+                </Button>
+                <Button Grid.Column="4"
+                    Style="{StaticResource commandButton}"
+                    Content="Delete"
+                    Tag="{StaticResource color4}"
+                    Click="DeleteButtonClicked">
+                    <Button.Visibility>
+                        <Binding Path="DeleteButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                    </Button.Visibility>
+                </Button>
+            </Grid>
+            <Border Grid.Row="1"
+                Background="{StaticResource panelActiveColor}"
+                CornerRadius="10" 
+                Padding="5"
+                Margin="0 10">
+                <DataGrid
+                      Name="LabRecordGrid"
+                      CanUserAddRows="False"
+                      Style="{StaticResource tableGrid}"
+                      ItemsSource="{Binding LabRecordList}"
+                      IsReadOnly="true"
+                      SelectionMode="Single"
+                      SelectionChanged="rowChanged"
+                      AutoGenerateColumns="True" 
+                      MouseDoubleClick="ViewDetails">
+                </DataGrid>
+            </Border>
+            <Grid Grid.Row="1">
+                <TextBlock x:Name="NoResult" Margin="100" HorizontalAlignment="Center" Text="No Results Found!" Visibility="{Binding NoResults}"/>
+            </Grid>
+            <!-- Delete Popup -->
+            <Popup Grid.Row="1" Name="deleteConfirmationPopup" IsOpen="False" Placement="Center" AllowsTransparency="True">
+                <Border BorderBrush="{StaticResource color19}" CornerRadius="10" BorderThickness="2" Background="{StaticResource color11}" Padding="40 20">
+                    <StackPanel>
+                        <TextBlock x:Name="DeletePopupText" Text="" Style="{StaticResource NormalText}" HorizontalAlignment="Center" Margin="10"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                            <Button Content="No" Width="80" Margin="5" Style="{StaticResource buttonMainRed}" Click="NoButton_Click"/>
+                            <Button Content="Yes" Width="80" Margin="5" Style="{StaticResource buttonMainGreen}" Click="YesButton_Click" Command="{Binding DeleteCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Popup>
+        </Grid>
+
+        <!--Update View-->
+        <Grid x:Name="updateView">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Visibility>
+                <Binding Path="UpdateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+            </Grid.Visibility>
+
+
+            <!--Left Section-->
+            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-80 -10">
+                            <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                                <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="0" Text="Doctor Name" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="1" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="2" Text="Doctor Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="3" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="4" Text="Nurse 1 Name" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="5" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="6" Width="160" Text="Nurse 1 Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="8" Text="Nurse 2 Name" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="9" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="10" Width="160" Text="Nurse 2 Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="11" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="12" Text="Patient *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="13" Margin="20 0 0 10" Text="{Binding PatientErrorMessage}" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="14" Text="Chit Number *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="15" Margin="20 0 0 10" Text="{Binding ChitNumberErrorMessage}" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="16" Width="170" Text="Consumable Charges *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="17" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="18" Text="Consultant Fee" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="19" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="20" Text="Lab Bill *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="21" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="22" Text="Total Bill *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="23" Text="{Binding TotalCostErrorMessage}" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="24" Text="Admit Date *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="25" Text="{Binding AdmitDateErrorMessage}" Style="{StaticResource textError}" />
+
+                        <ComboBox x:Name="Doctor" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding DoctorList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Doctor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}"/>
+                        <uc:TextBoxUserControl x:Name="DocComm" Grid.Column="1" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" EnableDefaultZero="True" Hint="Enter doctor commission" Text="{Binding DocComm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox x:Name="Nurse1" Grid.Column="1" Grid.Row="4" ItemsSource="{Binding NurseList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Nurse1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}"/>
+                        <uc:TextBoxUserControl x:Name="Nurse1Comm" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" EnableDefaultZero="True" Hint="Enter nurse 1 commission" Text="{Binding Nurse1Comm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox x:Name="Nurse2" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding NurseList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Nurse2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}"/>
+                        <uc:TextBoxUserControl x:Name="Nurse2Comm" Grid.Column="1" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" EnableDefaultZero="True" Hint="Enter nurse 2 commission" Text="{Binding Nurse2Comm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox x:Name="Patient" Grid.Column="1" Grid.Row="12" ItemsSource="{Binding PatientList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Patient, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <uc:TextBoxUserControl x:Name="ChitNumber" Grid.Column="1" Grid.Row="14" Hint="Enter chit number"  Text="{Binding ChitNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <uc:TextBoxUserControl x:Name="OtherCharges" Grid.Column="1" Grid.Row="16" PreviewTextInput="NumberValidationTextBox" EnableDefaultZero="True" Hint="Enter other charges" Text="{Binding OtherCharges, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <uc:TextBoxUserControl x:Name="ConsultantFee" Grid.Column="1" Grid.Row="18" PreviewTextInput="NumberValidationTextBox" EnableDefaultZero="True" Hint="Enter consultant fee" Text="{Binding ConsultantFee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <uc:TextBoxUserControl x:Name="LabBill" Grid.Column="1" Grid.Row="20" PreviewTextInput="NumberValidationTextBox" Hint="Enter lab bill" Text="{Binding LabBill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <uc:TextBoxUserControl x:Name="TotalBill" Grid.Column="1" Grid.Row="22" Hint="Enter total bill" Text="{Binding TotalBill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <DatePicker Name="AdmitDate" Grid.Column="1" Grid.Row="24" PreviewKeyDown="DatePicker_PreviewKeyDown" Foreground="Black" SelectedDate="{Binding AdmitDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
+
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+
+            <!--Right Section-->
+            <Border Grid.Column="1" Padding="10" Margin="0" Background="{StaticResource color8}" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible" Focusable="False">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Lab Test" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="-50 0 0 0" Text="1." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab1" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="2" Margin="-50 0 0 0" Text="2." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab2" Grid.Column="0" Grid.Row="2" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="3" Margin="-50 0 0 0" Text="3." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab3" Grid.Column="0" Grid.Row="3" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="4" Margin="-50 0 0 0" Text="4." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab4" Grid.Column="0" Grid.Row="4" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="5" Margin="-50 0 0 0" Text="5." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab5" Grid.Column="0" Grid.Row="5" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="6" Margin="-50 0 0 0" Text="6." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab6" Grid.Column="0" Grid.Row="6" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="7" Margin="-50 0 0 0" Text="7." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab7" Grid.Column="0" Grid.Row="7" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="8" Margin="-50 0 0 0" Text="8." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab8" Grid.Column="0" Grid.Row="8" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="9" Margin="-50 0 0 0" Text="9." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab9" Grid.Column="0" Grid.Row="9" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="10" Margin="-60 0 0 0" Text="10." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab10" Grid.Column="0" Grid.Row="10" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+
+                        <TextBlock Grid.Column="1" Grid.Row="0"  Padding="10" Text="Cost" Style="{StaticResource text}"/>
+                        <TextBox x:Name="LabTotal1" Grid.Column="1" Width="100" Grid.Row="1" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal2" Grid.Column="1" Width="100" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal3" Grid.Column="1" Width="100" Grid.Row="3" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal4" Grid.Column="1" Width="100" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal5" Grid.Column="1" Width="100" Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal6" Grid.Column="1" Width="100" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal7" Grid.Column="1" Width="100" Grid.Row="7" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal8" Grid.Column="1" Width="100" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal9" Grid.Column="1" Width="100" Grid.Row="9" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal10" Grid.Column="1" Width="100" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Column="2" Grid.Row="0" Padding="10" Text="Consumables" Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Med1" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med2" Grid.Column="2" Grid.Row="2" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med3" Grid.Column="2" Grid.Row="3" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med4" Grid.Column="2" Grid.Row="4" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med5" Grid.Column="2" Grid.Row="5" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med6" Grid.Column="2" Grid.Row="6" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med7" Grid.Column="2" Grid.Row="7" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med8" Grid.Column="2" Grid.Row="8" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med9" Grid.Column="2" Grid.Row="9" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med10" Grid.Column="2" Grid.Row="10" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+
+                        <TextBlock Grid.Column="3" Grid.Row="0" Padding="10" Text="Amount" Style="{StaticResource text}"/>
+                        <TextBox x:Name="Dose1" Grid.Column="3" Width="100" Grid.Row="1" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose2" Grid.Column="3" Width="100" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose3" Grid.Column="3" Width="100" Grid.Row="3" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose4" Grid.Column="3" Width="100" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose5" Grid.Column="3" Width="100" Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose6" Grid.Column="3" Width="100" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose7" Grid.Column="3" Width="100" Grid.Row="7" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose8" Grid.Column="3" Width="100" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose9" Grid.Column="3" Width="100" Grid.Row="9" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose10" Grid.Column="3" Width="100" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Column="4" Grid.Row="0" Padding="10" Text="Total" Style="{StaticResource text}"/>
+                        <TextBox x:Name="Total1" Grid.Column="4" Width="100" Grid.Row="1" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total2" Grid.Column="4" Width="100" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total3" Grid.Column="4" Width="100" Grid.Row="3" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total4" Grid.Column="4" Width="100" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total5" Grid.Column="4" Width="100" Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total6" Grid.Column="4" Width="100" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total7" Grid.Column="4" Width="100" Grid.Row="7" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total8" Grid.Column="4" Width="100" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total9" Grid.Column="4" Width="100" Grid.Row="9" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total10" Grid.Column="4" Width="100" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Grid Grid.Column="0" Grid.Row="11" Margin="0 40 0 0">
+                            <Button Style="{StaticResource cancelButton}" Command="{Binding ResetCommand}" Margin="0 0 10 0" Content="Reset" />
+
+                            <Grid.Visibility>
+                                <Binding Path="ResetUpdateButtonsVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                            </Grid.Visibility>
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="11" Margin="0 40 0 0">
+                            <Button Grid.Column="1" Style="{StaticResource mainButton}" Width="100" Margin="10 0 0 0" Content="Update" Command="{Binding UpdateLabRecordCommand}"/>
+
+                            <Grid.Visibility>
+                                <Binding Path="ResetUpdateButtonsVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+                            </Grid.Visibility>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!--Create View-->
+        <Grid x:Name="createView">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Visibility>
+                <Binding Path="CreateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
+            </Grid.Visibility>
+
+            <!--Left Section-->
+            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-80 -10">
+                            <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                                <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="0" Text="Doctor Name" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="1" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="2" Text="Doctor Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="3" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="4" Text="Nurse 1 Name" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="5" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="6" Width="160"  Text="Nurse 1 Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="8" Text="Nurse 2 Name" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="9" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="10" Width="160" Text="Nurse 2 Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="11" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="12" Text="Patient *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="13" Margin="20 0 0 10" Text="{Binding PatientErrorMessage}" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="14" Text="Chit Number *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="15" Margin="20 0 0 10" Text="{Binding ChitNumberErrorMessage}" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="16" Width="170" Text="Consumable Charges *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="17" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="18" Text="Consultant Fee" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="19" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="20" Text="Lab Bill *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="21" Text="" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="22" Text="Total Bill *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="23" Text="{Binding TotalCostErrorMessage}" Style="{StaticResource textError}" />
+                        <TextBlock Grid.Row="24" Text="Admit Date *" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="25" Text="{Binding AdmitDateErrorMessage}" Style="{StaticResource textError}" />
+
+                        <ComboBox x:Name="DoctorCreate" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding DoctorList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Doctor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}"/>
+                        <uc:TextBoxUserControl x:Name="DocCommCreate" Grid.Column="1" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Hint="Enter doctor commission" EnableDefaultZero="True" Text="{Binding DocComm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox x:Name="Nurse1Create" Grid.Column="1" Grid.Row="4" ItemsSource="{Binding NurseList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Nurse1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}"/>
+                        <uc:TextBoxUserControl x:Name="Nurse1CommCreate" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter nurse 1 commission" EnableDefaultZero="True" Text="{Binding Nurse1Comm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox x:Name="Nurse2Create" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding NurseList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Nurse2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}"/>
+                        <uc:TextBoxUserControl x:Name="Nurse2CommCreate" Grid.Column="1" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Hint="Enter nurse 2 commission" EnableDefaultZero="True" Text="{Binding Nurse2Comm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ComboBox x:Name="PatientCreate" Grid.Column="1" Grid.Row="12" ItemsSource="{Binding PatientList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Patient, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <uc:TextBoxUserControl x:Name="ChitNumberCreate" Grid.Column="1" Grid.Row="14" Hint="Enter chit number"  Text="{Binding ChitNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <uc:TextBoxUserControl x:Name="OtherChargesCreate" Grid.Column="1" Grid.Row="16" PreviewTextInput="NumberValidationTextBox" Hint="Enter other charges" EnableDefaultZero="True" Text="{Binding OtherCharges, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <uc:TextBoxUserControl x:Name="ConsultantFeeCreate" Grid.Column="1" Grid.Row="18" PreviewTextInput="NumberValidationTextBox" Hint="Enter consultant fee" EnableDefaultZero="True" Text="{Binding ConsultantFee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <uc:TextBoxUserControl x:Name="LabBillCreate" Grid.Column="1" Grid.Row="20" PreviewTextInput="NumberValidationTextBox" Hint="Enter lab bill" Text="{Binding LabBill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <uc:TextBoxUserControl x:Name="TotalBillCreate" Grid.Column="1" Grid.Row="22" Hint="Enter total bill" Text="{Binding TotalBill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <DatePicker Name="AdmitDateCreate" Grid.Column="1" Grid.Row="24" PreviewKeyDown="DatePicker_PreviewKeyDown" Foreground="Black" SelectedDate="{Binding AdmitDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
+
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+
+            <!--Right Section-->
+            <Border Grid.Column="1" Padding="10" Background="{StaticResource color8}" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Visible" Focusable="False">
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Lab Test" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Column="0" Grid.Row="1" Margin="-50 0 0 0" Text="1." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab1Create" Grid.Column="0" Grid.Row="1" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="2" Margin="-50 0 0 0" Text="2." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab2Create" Grid.Column="0" Grid.Row="2" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="3" Margin="-50 0 0 0" Text="3." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab3Create" Grid.Column="0" Grid.Row="3" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="4" Margin="-50 0 0 0" Text="4." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab4Create" Grid.Column="0" Grid.Row="4" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="5" Margin="-50 0 0 0" Text="5." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab5Create" Grid.Column="0" Grid.Row="5" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="6" Margin="-50 0 0 0" Text="6." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab6Create" Grid.Column="0" Grid.Row="6" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="7" Margin="-50 0 0 0" Text="7." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab7Create" Grid.Column="0" Grid.Row="7" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="8" Margin="-50 0 0 0" Text="8." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab8Create" Grid.Column="0" Grid.Row="8" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="9" Margin="-50 0 0 0" Text="9." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab9Create" Grid.Column="0" Grid.Row="9" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <TextBlock Grid.Column="0" Grid.Row="10" Margin="-55 0 0 0" Text="10." Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Lab10Create" Grid.Column="0" Grid.Row="10" ItemsSource="{Binding LabTests}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Lab10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+
+                        <TextBlock Grid.Column="1" Grid.Row="0"  Padding="10" Text="Cost" Style="{StaticResource text}"/>
+                        <TextBox x:Name="LabTotal1Create" Grid.Column="1" Width="100" Grid.Row="1" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal2Create" Grid.Column="1" Width="100" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal3Create" Grid.Column="1" Width="100" Grid.Row="3" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal4Create" Grid.Column="1" Width="100" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal5Create" Grid.Column="1" Width="100" Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal6Create" Grid.Column="1" Width="100" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal7Create" Grid.Column="1" Width="100" Grid.Row="7" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal8Create" Grid.Column="1" Width="100" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal9Create" Grid.Column="1" Width="100" Grid.Row="9" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="LabTotal10Create" Grid.Column="1" Width="100" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding LabTotal10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <TextBlock Grid.Column="2" Grid.Row="0" Padding="10" Text="Consumables" Style="{StaticResource text}"/>
+                        <ComboBox x:Name="Med1Create" Grid.Column="2" Grid.Row="1" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med2Create" Grid.Column="2" Grid.Row="2" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med3Create" Grid.Column="2" Grid.Row="3" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med4Create" Grid.Column="2" Grid.Row="4" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med5Create" Grid.Column="2" Grid.Row="5" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med6Create" Grid.Column="2" Grid.Row="6" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med7Create" Grid.Column="2" Grid.Row="7" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med8Create" Grid.Column="2" Grid.Row="8" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med9Create" Grid.Column="2" Grid.Row="9" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        <ComboBox x:Name="Med10Create" Grid.Column="2" Grid.Row="10" ItemsSource="{Binding MedicineList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Med10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource normalComboBox}" />
+                        
+                        <TextBlock Grid.Column="3" Grid.Row="0" Padding="10" Text="Amount" Style="{StaticResource text}"/>
+                        <TextBox x:Name="Dose1Create" Grid.Column="3" Width="100" Grid.Row="1" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose2Create" Grid.Column="3" Width="100" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose3Create" Grid.Column="3" Width="100" Grid.Row="3" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose4Create" Grid.Column="3" Width="100" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose5Create" Grid.Column="3" Width="100" Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose6Create" Grid.Column="3" Width="100" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose7Create" Grid.Column="3" Width="100" Grid.Row="7" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose8Create" Grid.Column="3" Width="100" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose9Create" Grid.Column="3" Width="100" Grid.Row="9" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Dose10Create" Grid.Column="3" Width="100" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Dose10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <TextBlock Grid.Column="4" Grid.Row="0" Padding="10" Text="Total" Style="{StaticResource text}"/>
+                        <TextBox x:Name="Total1Create" Grid.Column="4" Width="100" Grid.Row="1" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total2Create" Grid.Column="4" Width="100" Grid.Row="2" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total3Create" Grid.Column="4" Width="100" Grid.Row="3" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total4Create" Grid.Column="4" Width="100" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total5Create" Grid.Column="4" Width="100" Grid.Row="5" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total5, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total6Create" Grid.Column="4" Width="100" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total6, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total7Create" Grid.Column="4" Width="100" Grid.Row="7" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total7, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total8Create" Grid.Column="4" Width="100" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total8, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total9Create" Grid.Column="4" Width="100" Grid.Row="9" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total9, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox x:Name="Total10Create" Grid.Column="4" Width="100" Grid.Row="10" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource normalTextBox}" Text="{Binding Total10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <Grid Grid.Column="0" Grid.Row="12" Margin="0 10 0 0">
+                            <Button Style="{StaticResource cancelButton}" Command="{Binding CancelCommand}" Margin="0 0 10 0" Content="Cancel" />
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.Row="12" Margin="0 10 0 0">
+                            <Button Grid.Column="1" Style="{StaticResource mainButton}" Width="100" Margin="10 0 0 0" Content="Create" Command="{Binding CreateLabRecordCommand}"/>
+                        </Grid>
+
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+
+        </Grid>
+    </Grid>
+</UserControl>

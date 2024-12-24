@@ -1,0 +1,15 @@
+﻿using QWellApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace QWellApp.Repositories
+{
+    public interface IRoleRepository
+    {
+        IEnumerable<Role> GetAll();
+        Role GetByID(int id);
+    }
+}
