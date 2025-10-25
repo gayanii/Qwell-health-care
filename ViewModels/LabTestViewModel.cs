@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
+using Newtonsoft.Json;
 using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
@@ -44,6 +45,8 @@ namespace QWellApp.ViewModels
 
         private IUserRepository userRepository;
         private ILabTestRepository labTestRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
         //Properties 
         public int SelectedId
@@ -327,6 +330,8 @@ namespace QWellApp.ViewModels
             userRepository = new UserRepository();
             StatusList = new List<string>() { UserStatusEnum.Active.ToString(), UserStatusEnum.Inactive.ToString() };
             LoadLabTestList(SearchWord);
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
             GetLabTestDetails = new RelayCommand(ExecuteGetLabTestDetailsCommand, CanExecuteGetLabTestDetailsCommand);
             UpdateLabTestCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteForAdminsCommand);
@@ -340,9 +345,20 @@ namespace QWellApp.ViewModels
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = labTestRepository.GetByID(SelectedId);
             var deleteSuccess = labTestRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.LabTests,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadLabTestList("");
             }
         }
@@ -392,6 +408,16 @@ namespace QWellApp.ViewModels
                 var createSuccess = labTestRepository.Add(createLabTest);
                 if (createSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.LabTests,
+                        AffectedEntityId = createLabTest.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(createLabTest)
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     LabTestListVisibility = true;
                     CreateGridVisibility = false;
@@ -462,9 +488,20 @@ namespace QWellApp.ViewModels
                     LabPaid = LabPaid,
                     Status = (Status == "") ? UserStatusEnum.Active.ToString() : Status,
                 };
+                var oldData = labTestRepository.GetByID(updateLabTest.Id);
                 bool editSuccess = labTestRepository.Edit(updateLabTest);
                 if (editSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.LabTests,
+                        AffectedEntityId = updateLabTest.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                        NewValues = JsonConvert.SerializeObject(updateLabTest) // Serialize the whole object
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     LabTestListVisibility = true;
                     CreateGridVisibility = false;

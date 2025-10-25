@@ -45,6 +45,9 @@
         <DataTemplate DataType="{x:Type viewModel:ProcedureRecordViewModel}">
             <uc:ProcedureRecordView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:ChannelRecordViewModel}">
+            <uc:ChannelRecordView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type viewModel:LabTestViewModel}">
             <uc:LabTestView/>
         </DataTemplate>
@@ -56,6 +59,12 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModel:SummaryViewModel}">
             <uc:SummaryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:ChangePasswordViewModel}">
+            <uc:ChangePasswordView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:ActivityLogViewModel}">
+            <uc:ActivityLogsView/>
         </DataTemplate>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
     </Window.Resources>
@@ -97,7 +106,8 @@
                         <!--Logo-->
                         <StackPanel Orientation="Horizontal"
                                 Height="35"
-                               Margin="15,25,0,40">
+                                HorizontalAlignment="Left"
+                                Margin="15,5,0,40">
 
                             <Image Source="/Assets/Images/Email.png" Height="30" />
                             <TextBlock Text="QWell"
@@ -105,8 +115,9 @@
                                    FontSize="20"
                                    FontFamily="Montserrat"
                                    FontWeight="Bold"
-                                  VerticalAlignment="Center"
-                                   Margin="10,0,0,0" />
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="20,20,0,0" />
                         </StackPanel>
 
                         <!--Menu Buttons-->
@@ -210,7 +221,17 @@
                                 <TextBlock Text="Lab Records" Style="{StaticResource menuButtonText}" />
                             </StackPanel>
                         </RadioButton>
-                        
+
+                        <!--Channel Records-->
+                        <RadioButton Style="{StaticResource menuButton}"
+                                 Tag="{StaticResource color6}"
+                                 Command="{Binding ShowChannelRecordViewCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="FileMedical" Style="{StaticResource menuButtonIcon}" />
+                                <TextBlock Text="Channelling Records" Style="{StaticResource menuButtonText}" />
+                            </StackPanel>
+                        </RadioButton>
+
                         <!--Commission-->
                         <Expander IsExpanded="False"
                                   Margin="5"
@@ -302,6 +323,16 @@
                                 <TextBlock Text="Summary" Style="{StaticResource menuButtonText}" />
                             </StackPanel>
                         </RadioButton>
+
+                        <!--Activity Logs-->
+                        <RadioButton Style="{StaticResource menuButton}"
+                             Tag="{StaticResource color3}"
+                             Command="{Binding ShowActivityLogsViewCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:IconImage Icon="ClipboardList" Style="{StaticResource menuButtonIcon}" />
+                                <TextBlock Text="Activity Logs" Style="{StaticResource menuButtonText}" />
+                            </StackPanel>
+                        </RadioButton>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
@@ -380,7 +411,7 @@
                         </StackPanel>
 
                         <!--User options-->
-                        <StackPanel Grid.Column="1"
+                        <!--<StackPanel Grid.Column="1"
                                     Orientation="Horizontal"
                                     FlowDirection="RightToLeft"
                                     VerticalAlignment="Center"
@@ -392,7 +423,7 @@
                                        FontSize="14"
                                        VerticalAlignment="Center"
                                        FontWeight="Bold"/>
-                            <!--Profile pic-->
+                            --><!--Profile pic-->
                             <!--<Ellipse Height="35" Width="35"
                                      Stroke="{StaticResource color2}"
                                      StrokeThickness="2"
@@ -400,7 +431,7 @@
                                 <Ellipse.Fill>
                                     <ImageBrush ImageSource="/Assets/Images/img.png" />
                                 </Ellipse.Fill>
-                            </Ellipse>-->
+                            </Ellipse>--><!--
                             <Button Style="{StaticResource iconButton}"
                                     Tag="{StaticResource color18}"
                                     Margin="10 0"
@@ -412,6 +443,96 @@
                                     <TextBlock Text="Log Out" Margin="8"/>
                                 </StackPanel>
                             </Button>
+                        </StackPanel>-->
+                        <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            FlowDirection="RightToLeft"
+                            VerticalAlignment="Center"
+                            Margin="0,20,20,0"
+                            Height="100">
+                            <!-- User Account Button -->
+                            <Button x:Name="UserButton"
+                                Tag="{StaticResource color18}"
+                                Margin="0 0"
+                                Width="200"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Style="{StaticResource iconButton}"
+                                Click="UserButton_Click">
+                                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding CurrentUserAccount.Username}" Margin="8"/>
+                                </StackPanel>
+                            </Button>
+                            <!--Profile pic-->
+                            <!--<Ellipse Height="35" Width="35"
+                                     Stroke="{StaticResource color2}"
+                                     StrokeThickness="2"
+                                     Margin="10,0,10,0">
+                                <Ellipse.Fill>
+                                    <ImageBrush ImageSource="/Assets/Images/img.png" />
+                                </Ellipse.Fill>
+                            </Ellipse>-->
+                            <Button Style="{StaticResource iconButton}"
+                                Tag="{StaticResource color18}"
+                                Margin="10 0"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Command="{Binding LogoutCommand}">
+                                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                                    <fa:IconImage Icon="Clock" Style="{StaticResource iconButtonIcon}" />
+                                    <TextBlock Text="Log Out" Margin="8"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Dropdown Panel (Popup) -->
+                            <!--<Popup x:Name="UserPopup" 
+                                Placement="Bottom"
+                                PlacementTarget="{Binding ElementName=UserButton}"
+                                StaysOpen="False"
+                                AllowsTransparency="True">
+                                <Border Background="White" 
+                                    CornerRadius="5" 
+                                    Padding="5" 
+                                    Width="150" 
+                                    Height="Auto"
+                                    BorderBrush="Gray"
+                                    BorderThickness="1">
+                                    <StackPanel>
+                                        <Button Content="Change Password" 
+                                            Command="{Binding ShowChangePasswordViewCommand}"
+                                            HorizontalAlignment="Stretch"
+                                            Padding="5"/>
+                                    </StackPanel>
+                                </Border>
+                            </Popup>-->
+                            <!-- ComboBox -->
+                            <!--<ComboBox x:Name="UserPopup" Grid.Column="1" Visibility="Visible">
+                                <ComboBox.Items>
+                                    <ComboBoxItem>
+                                        <Button Content="Change Password" Command="{Binding ShowChangePasswordViewCommand}" Click="ChangePassword_Click"/>
+                                    </ComboBoxItem>
+                                </ComboBox.Items>
+                            </ComboBox>-->
+                            <!-- Popup for Dropdown -->
+                            <Popup x:Name="UserPopup"
+                                   PlacementTarget="{Binding ElementName=UserButton}"
+                                   Placement="Top"
+                                   Margin="100"
+                                   Height="70"
+                                   Width="200"
+                                   StaysOpen="False">
+                                <Border Background="White" BorderBrush="Black" BorderThickness="1" Margin="0 0" CornerRadius="5" Padding="10">
+                                    <StackPanel Margin="0 10">
+                                        <Button Content="Change Password" 
+                                            Style="{StaticResource iconButton}"
+                                            Tag="{StaticResource color2}"
+                                            FontWeight="Bold"
+                                            FontSize="14"
+                                            Command="{Binding ShowChangePasswordViewCommand}" 
+                                            Click="ChangePassword_Click"/>
+                                    </StackPanel>
+                                </Border>
+                            </Popup>
                         </StackPanel>
 
                     </Grid>

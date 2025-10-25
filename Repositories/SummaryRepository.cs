@@ -170,6 +170,40 @@ namespace QWellApp.Repositories
             }
         }
 
+        public async Task<IEnumerable<ChannelSummary>> GetChannelSummary(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                using (AppDataContext context = new AppDataContext())
+                {
+                    return await GetSummaryAsync<ChannelRecord, ChannelSummary>(
+                startDate, endDate,
+                record =>
+                {
+                    float totCom = CalculateTotalCommissions(record.DoctorId, record.DocComm, record.Nurse1Id, record.Nurse1Comm, record.Nurse2Id, record.Nurse2Comm);
+                    return new ChannelSummary
+                    {
+                        Id = record.Id,
+                        ChitNumber = record.ChitNumber,
+                        AdmitDate = record.AdmitDate.ToString("dd-MMM-yyyy HH:mm"),
+                        OPDCharge = record.OPDCharge ?? 0,
+                        PharmacyBill = record.PharmacyBill,
+                        ConsultantFee = record.ConsultantFee ?? 0,
+                        OtherCharges = record.OtherCharges ?? 0,
+                        TotalCommisions = totCom,
+                        TotalBill = (record.PharmacyBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0)
+                    };
+                },
+                context.ChannelRecords.AsQueryable());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+                throw;
+            }
+        }
+
         // Helper method to calculate total commissions
         private float CalculateTotalCommissions(int? doctorId, float? docComm, int? nurse1Id, float? nurse1Comm, int? nurse2Id, float? nurse2Comm)
         {
@@ -202,6 +236,10 @@ namespace QWellApp.Repositories
                     if (typeof(T) == typeof(LabSummary))
                     {
                         commissions = await commissionRepository.GetLabCommissions(startDate, endDate);
+                    }
+                    if (typeof(T) == typeof(ChannelSummary))
+                    {
+                        commissions = await commissionRepository.GetChannelCommissions(startDate, endDate);
                     }
 
                     foreach (var commission in commissions)
@@ -237,13 +275,13 @@ namespace QWellApp.Repositories
             }
         }
 
-        public Report GenerateFullReport(Report medicalReport, Report procedureReport, Report labReport)
+        public Report GenerateFullReport(Report medicalReport, Report procedureReport, Report labReport, Report channelReport)
         {
             Report report = new Report()
             {
-                TotalIncome = medicalReport.TotalIncome + procedureReport.TotalIncome + labReport.TotalIncome,
-                TotalLabPaid = medicalReport.TotalLabPaid + procedureReport.TotalLabPaid + labReport.TotalLabPaid,
-                TotalCommissions = medicalReport.TotalCommissions + procedureReport.TotalCommissions + labReport.TotalCommissions
+                TotalIncome = medicalReport.TotalIncome + procedureReport.TotalIncome + labReport.TotalIncome + channelReport.TotalIncome,
+                TotalLabPaid = medicalReport.TotalLabPaid + procedureReport.TotalLabPaid + labReport.TotalLabPaid + channelReport.TotalLabPaid,
+                TotalCommissions = medicalReport.TotalCommissions + procedureReport.TotalCommissions + labReport.TotalCommissions + channelReport.TotalCommissions
             };
 
             report.Balance = (float)Math.Round((report.TotalIncome - report.TotalLabPaid - report.TotalCommissions) ?? 0, 2);

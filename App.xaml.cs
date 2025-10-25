@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using QWellApp.DBConnection;
+using QWellApp.Mappers;
 using QWellApp.Views.Pages;
 using System;
 using System.Collections.Generic;
@@ -16,11 +18,19 @@ namespace QWell
     /// </summary>
     public partial class App : Application
     {
+        public static IMapper Mapper { get; private set; }
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             //DatabaseFacade facade = new DatabaseFacade(new AppDataContext());
             //facade.EnsureCreated();
+            // AutoMapper Configuration
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>();
+            });
+
+            Mapper = mapperConfig.CreateMapper();
         }
 
         protected  void ApplicationStart(object sender, StartupEventArgs e)

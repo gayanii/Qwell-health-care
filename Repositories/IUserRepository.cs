@@ -11,6 +11,7 @@ namespace QWellApp.Repositories
     public interface IUserRepository
     {
         bool AuthenticateUser(NetworkCredential credential);
+        bool ChangePassword(NetworkCredential changePasswordModel);
         bool Add(UserDetails userModel);
         bool Edit(UserDetails userModel);
         bool Remove(int id);

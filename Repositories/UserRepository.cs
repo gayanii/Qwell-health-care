@@ -23,16 +23,19 @@ using System.Numerics;
 using System.Threading;
 using QWellApp.Helpers;
 using QWellApp.Enums;
+using Newtonsoft.Json;
 
 namespace QWellApp.Repositories
 {
     public class UserRepository : BaseRepository, IUserRepository
     {
         public IRoleRepository roleRepository;
+        //public IActivityLogRepository activityLogRepository;
 
         public UserRepository()
         {
             roleRepository = new RoleRepository();
+            //activityLogRepository = new ActivityLogRepository();
         }
         public bool Add(UserDetails userModel)
         {
@@ -68,6 +71,19 @@ namespace QWellApp.Repositories
 
                     context.Users.Add(newUser);
                     context.SaveChanges();
+
+                    //// Log the activity
+                    //var log = new ActivityLog
+                    //{
+                    //    AffectedEntity = EntitiesEnum.Employees,
+                    //    AffectedEntityId = newUser.Id,
+                    //    ActionType = ActionTypeEnum.Add,
+                    //    OldValues = null,
+                    //    NewValues = JsonConvert.SerializeObject(newUser) // Serialize the whole object
+                    //};
+
+                    //activityLogRepository.AddLog(log);
+
                     MessageBox.Show("User created successfully!");
                     return true;
                 }
@@ -116,6 +132,45 @@ namespace QWellApp.Repositories
             }
         }
 
+        public bool ChangePassword(NetworkCredential changePasswordModel)
+        {
+            try
+            {
+                using (var context = new AppDataContext())
+                {
+                    var user = context.Users.FirstOrDefault(x => x.Username == changePasswordModel.UserName);
+                    var usernamefound = context.Users.Any(x => x.Username.Equals(changePasswordModel.UserName));
+                    if (user != null)
+                    {
+                        if (usernamefound)
+                        {
+                            var salt = PasswordHelper.GenerateSalt();
+                            var passwordHash = PasswordHelper.HashPassword(changePasswordModel.Password, salt);
+
+                            user.PasswordHash = passwordHash;
+                            user.PasswordSalt = salt;
+
+                            context.Entry(user).State = EntityState.Modified;
+                            context.SaveChanges();
+                            MessageBox.Show("Password changed successfully!");
+                            return true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Username does not exist");
+                        }
+                    }
+                    MessageBox.Show("Failed to update!");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+                return false;
+            }
+        }
+
         public bool Edit(UserDetails userModel)
         {
             try
@@ -128,6 +183,15 @@ namespace QWellApp.Repositories
                     {
                         if (!usernamefound)
                         {
+                            //// Log the activity
+                            //var log = new ActivityLog
+                            //{
+                            //    AffectedEntity = EntitiesEnum.Employees,
+                            //    AffectedEntityId = userModel.Id,
+                            //    ActionType = ActionTypeEnum.Update,
+                            //    OldValues = JsonConvert.SerializeObject(userModel), // Serialize the whole object
+                            //};
+
                             user.FirstName = userModel.FirstName;
                             user.LastName = userModel.LastName;
                             user.Email = userModel.Email;
@@ -142,6 +206,11 @@ namespace QWellApp.Repositories
 
                             context.Entry(user).State = EntityState.Modified;
                             context.SaveChanges();
+
+                            //log.NewValues = JsonConvert.SerializeObject(user); // Serialize the whole object
+
+                            //activityLogRepository.AddLog(log);
+
                             MessageBox.Show("Updated Successfully!");
                             return true;
                         } else
@@ -175,7 +244,7 @@ namespace QWellApp.Repositories
                         p.Email.ToLower().Contains(normalizedSearchWord) || p.MobileNum.Contains(normalizedSearchWord) || p.NIC.Contains(normalizedSearchWord) ||
                         p.TelephoneNum.Contains(normalizedSearchWord) || p.Status.ToLower().Contains(normalizedSearchWord) || p.Role.RoleName.ToLower().Contains(normalizedSearchWord) ||
                         p.EmployeeType.ToLower().Contains(normalizedSearchWord) || p.Username.ToLower().Contains(normalizedSearchWord))
-                        .OrderBy(p => p.FirstName) // Sort FirstName id in descending order. recent up
+                        .OrderBy(p => p.FirstName) // Sort FirstName in ascending order
                         .ToList();
                     foreach (var user in userList)
                     {
@@ -208,7 +277,7 @@ namespace QWellApp.Repositories
                 {
                     var doctorList = context.Users
                         .Where(p => p.RoleId.Equals(1) && p.Status.Equals(UserStatusEnum.Active.ToString()))
-                        .OrderBy(p => p.FirstName) // Sort by FirstName in descending order. recent up
+                        .OrderBy(p => p.FirstName) // Sort FirstName in ascending order
                         .ToList();
                     foreach (var doctor in doctorList)
                     {
@@ -242,7 +311,7 @@ namespace QWellApp.Repositories
                 {
                     var nurseList = context.Users
                         .Where(p => new[] { 2, 3, 4, 5, 6, 7, 8 }.Contains(p.RoleId) && p.Status.Equals(UserStatusEnum.Active.ToString()))
-                        .OrderBy(p => p.FirstName) // Sort by FirstName in descending order. recent up
+                        .OrderBy(p => p.FirstName) // Sort FirstName in ascending order
                         .ToList();
                     foreach (var nurse in nurseList)
                     {
@@ -376,6 +445,19 @@ namespace QWellApp.Repositories
                         user.Status = UserStatusEnum.Inactive.ToString();
                         context.Entry(user).State = EntityState.Modified;
                         context.SaveChanges();
+
+                        //// Log the activity
+                        //var log = new ActivityLog
+                        //{
+                        //    AffectedEntity = EntitiesEnum.Employees,
+                        //    AffectedEntityId = id,
+                        //    ActionType = ActionTypeEnum.Delete,
+                        //    OldValues = JsonConvert.SerializeObject(user), // Serialize the whole object
+                        //    NewValues = null
+                        //};
+
+                        //activityLogRepository.AddLog(log);
+
                         MessageBox.Show("Status Changed Successfully!");
                         return true;
                     } else

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
+using Newtonsoft.Json;
 using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
@@ -43,6 +44,8 @@ namespace QWellApp.ViewModels
 
         private IUserRepository userRepository;
         private IProductRepository productRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
         //Properties 
         public int SelectedId
@@ -348,6 +351,8 @@ namespace QWellApp.ViewModels
             ProductList = new List<ProductView>();
             productRepository = new ProductRepository();
             userRepository = new UserRepository();
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             StatusList = new List<string>() { UserStatusEnum.Active.ToString(), UserStatusEnum.Inactive.ToString() };
             LoadProductList(SearchWord);
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
@@ -363,9 +368,20 @@ namespace QWellApp.ViewModels
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = productRepository.GetByID(SelectedId);
             var deleteSuccess = productRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.Products,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadProductList("");
             }
         }
@@ -415,6 +431,18 @@ namespace QWellApp.ViewModels
                 var createSuccess = productRepository.Add(createProduct);
                 if (createSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Products,
+                        AffectedEntityId = createProduct.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(createProduct)
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
+
+
                     UpdateGridVisibility = false;
                     ProductListVisibility = true;
                     CreateGridVisibility = false;
@@ -484,9 +512,20 @@ namespace QWellApp.ViewModels
                     SellingPrice = SellingPrice,
                     Status = (Status == "") ? UserStatusEnum.Active.ToString() : Status,
                 };
+                var oldData = productRepository.GetByID(updateProduct.Id);
                 bool editSuccess = productRepository.Edit(updateProduct);
                 if (editSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Products,
+                        AffectedEntityId = updateProduct.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                        NewValues = JsonConvert.SerializeObject(updateProduct) // Serialize the whole object
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     ProductListVisibility = true;
                     CreateGridVisibility = false;

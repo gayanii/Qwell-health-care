@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
@@ -142,7 +143,10 @@ namespace QWellApp.ViewModels
         private IProductRepository productRepository;
         private ILabRecordTestRepository labRecordTestRepository;
         private IProductMedicalRecordRepository productMedicalRecordRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
+        #region Properties
         public int SelectedId
         {
             get
@@ -1427,6 +1431,8 @@ namespace QWellApp.ViewModels
             }
         }
 
+        #endregion
+
         //Commands
         public ICommand LoadSearchResults { get; }
         public ICommand UpdateLabRecordCommand { get; }
@@ -1453,6 +1459,8 @@ namespace QWellApp.ViewModels
             DoctorList = new Dictionary<int, string>();
             NurseList = new Dictionary<int, string>();
             MedicineList = new Dictionary<int, string>();
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             LabTestList = new List<int>();
             LabTests = new Dictionary<int, string>();
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
@@ -1543,9 +1551,29 @@ namespace QWellApp.ViewModels
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = labRecordRepository.GetByID(SelectedId);
+            var oldMedicine = productMedicalRecordRepository.GetAll(SelectedId, RecordTypeEnum.Lab);
             var deleteSuccess = labRecordRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Transform oldMedicine list to remove unwanted properties
+                var filteredOldMedicineData = oldMedicine.Select(m => new
+                {
+                    m.Id,
+                    m.ProductId,
+                    m.Units,
+                    m.SoldPrice
+                }).ToList();
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.LabRecords,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredOldMedicineData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadLabRecordList("");
             }
         }
@@ -2005,9 +2033,40 @@ namespace QWellApp.ViewModels
                         }
                     }
                 }
+                var oldData = labRecordRepository.GetByID(updateLabRecord.Id);
+                var oldMedicine = productMedicalRecordRepository.GetAll(updateLabRecord.Id, RecordTypeEnum.Lab);
                 bool editSuccess = labRecordRepository.Edit(updateLabRecord, labRecordTestIds, medDoseIds);
                 if (editSuccess)
                 {
+                    var newMedicine = productMedicalRecordRepository.GetAll(updateLabRecord.Id, RecordTypeEnum.Lab);
+                    // Transform newMedicine list to remove unwanted properties
+                    var filteredNewMedicineData = newMedicine.Select(m => new
+                    {
+                        m.Id,
+                        m.ProductId,
+                        m.Units,
+                        m.SoldPrice
+                    }).ToList();
+
+                    // Transform oldMedicine list to remove unwanted properties
+                    var filteredOldMedicineData = oldMedicine.Select(m => new
+                    {
+                        m.Id,
+                        m.ProductId,
+                        m.Units,
+                        m.SoldPrice
+                    }).ToList();
+
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.LabRecords,
+                        AffectedEntityId = updateLabRecord.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredOldMedicineData),
+                        NewValues = JsonConvert.SerializeObject(updateLabRecord) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredNewMedicineData),
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     LabRecordListVisibility = true;
                     CreateGridVisibility = false;

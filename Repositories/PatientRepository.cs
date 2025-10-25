@@ -156,7 +156,7 @@ namespace QWellApp.Repositories
                             p.NIC.Contains(normalizedSearchWord) || 
                             p.Status.ToLower().Contains(normalizedSearchWord) || 
                             p.Gender.ToLower().Contains(normalizedSearchWord))
-                        .OrderBy(p => p.FirstName) // Sort by id in descending order. recent up
+                        .OrderBy(p => p.FirstName) // Sort FirstName in ascending order
                         .Select(p => new PatientView // Projecting directly to PatientView
                         {
                             Id = p.Id,

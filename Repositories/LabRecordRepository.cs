@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using QWellApp.DBConnection;
 using QWellApp.Enums;
 using QWellApp.Helpers;
@@ -22,6 +23,7 @@ namespace QWellApp.Repositories
         public IProductRepository productRepository;
         public ILabRecordTestRepository labRecordTestRepository;
         public IProductMedicalRecordRepository productMedicalRepository;
+        public IActivityLogRepository activityLogRepository;
         public Validation validator;
 
         public LabRecordRepository()
@@ -30,6 +32,7 @@ namespace QWellApp.Repositories
             productRepository = new ProductRepository();
             labRecordTestRepository = new LabRecordTestRepository();
             productMedicalRepository = new ProductMedicalRecordRepository();
+            activityLogRepository = new ActivityLogRepository();
             validator = new Validation();
         }
 
@@ -117,6 +120,29 @@ namespace QWellApp.Repositories
                     }
                     context.SaveChanges(); // Save changes after adding all doses
                     MessageBox.Show("Lab Record created Successfully!");
+
+                    var newMedicine = productMedicalRepository.GetAll(newLabRecord.Id, RecordTypeEnum.Lab);
+                    var currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
+                    // Transform newMedicine list to remove unwanted properties
+                    var filteredNewMedicineData = newMedicine.Select(m => new
+                    {
+                        m.Id,
+                        m.ProductId,
+                        m.Units,
+                        m.SoldPrice
+                    }).ToList();
+
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.LabRecords,
+                        AffectedEntityId = labRecordModel.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(labRecordModel) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredNewMedicineData),
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
+
                     return true;
                 }
             }

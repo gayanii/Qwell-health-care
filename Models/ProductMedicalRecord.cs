@@ -31,5 +31,8 @@ namespace QWellApp.Models
         [ForeignKey("LabRecordId")]
         public int? LabRecordId { get; set; }
         public virtual LabRecord? LabRecord { get; set; }
+        [ForeignKey("ChannelRecordId")]
+        public int? ChannelRecordId { get; set; }
+        public virtual ChannelRecord? ChannelRecord { get; set; }
     }
 }

@@ -15,6 +15,7 @@ namespace QWellApp.Repositories
         bool RemoveMedicalRecord(int id);
         bool RemoveProcedureRecord(int id);
         bool RemoveLabRecord(int id);
+        bool RemoveChannelRecord(int id);
         //IEnumerable<ProductMedicalRecord> GetByID(int id);
         IEnumerable<ProductMedicalRecord> GetAll(int recordId, RecordTypeEnum recordTypeId);
     }

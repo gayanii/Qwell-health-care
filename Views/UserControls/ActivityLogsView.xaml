@@ -1,0 +1,108 @@
+﻿<UserControl x:Class="QWellApp.Views.UserControls.ActivityLogsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QWellApp.Views.UserControls"
+             xmlns:uc="clr-namespace:QWellApp.UserControls"
+             xmlns:viewModel="clr-namespace:QWellApp.ViewModels"
+             xmlns:converter="clr-namespace:QWellApp.Helpers"
+             xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
+             MouseDown="Window_MouseDown"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <viewModel:ActivityLogViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converter:StringToBoolConverter x:Key="StringToBoolConverter" />
+        <converter:ListToStringConverter x:Key="ListToStringConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid x:Name="ActivityListView">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Top"
+                    Grid.Column="0">          
+                    <fa:IconImage Icon="Search" Height="20" Width="20" Foreground="{StaticResource color12}"/>
+                    <TextBox 
+                        x:Name="SearchBox"
+                        Text="{Binding SearchWord, UpdateSourceTrigger=PropertyChanged}"
+                        FontSize="13"
+                        Height="36"
+                        Width="300"
+                        Background="Transparent"
+                        FontWeight="Medium"
+                        FontFamily="Montserrat"                            
+                        Foreground="{StaticResource color12}"
+                        CaretBrush="{StaticResource color12}"
+                        BorderBrush="{StaticResource color12}"
+                        BorderThickness="0,0,0,2"                             
+                        VerticalContentAlignment="Center"
+                        Margin="5,5,0,0">
+                    </TextBox>
+                </StackPanel>
+            </Grid>
+            <Border Grid.Row="1"
+                    Background="{StaticResource panelActiveColor}"
+                    CornerRadius="10" 
+                    Padding="5"
+                    Margin="0 10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <DataGrid
+                        Name="ActivityLogGrid"
+                        CanUserAddRows="False"
+                        ItemsSource="{Binding ActivityLogList}"
+                        IsReadOnly="True"
+                        AutoGenerateColumns="False"
+                        Style="{StaticResource tableGrid}"
+                        RowDetailsVisibilityMode="Visible">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="130" Header="Date" Binding="{Binding Date}" />
+                        <DataGridTextColumn Width="160" Header="User" Binding="{Binding UserName}" />
+                        <DataGridTextColumn Width="100" Header="Entity" Binding="{Binding AffectedEntity}" />
+                        <DataGridTextColumn Width="100" Header="Action Type" Binding="{Binding ActionType}" />
+                        <DataGridTemplateColumn Header="Old Data">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock 
+                                        Margin="0,0,0,10" 
+                                        Text="{Binding OldValues}" 
+                                        TextWrapping="Wrap" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="New Data">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock 
+                                        Margin="0,0,0,10" 
+                                        Text="{Binding NewValues}" 
+                                        TextWrapping="Wrap" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                </ScrollViewer>
+            </Border>
+            <Grid Grid.Row="1">
+                <TextBlock x:Name="NoResult" Margin="100" HorizontalAlignment="Center" Text="No Results Found!" Visibility="{Binding NoResults}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -20,6 +20,7 @@ using System.Security;
 using System.Windows;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using QWellApp.Enums;
+using Newtonsoft.Json;
 
 namespace QWellApp.ViewModels
 {
@@ -115,7 +116,10 @@ namespace QWellApp.ViewModels
         private IPatientRepository patientRepository;
         private IProductRepository productRepository;
         private IProductMedicalRecordRepository productMedicalRecordRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
+        #region Propeties
         public int SelectedId
         {
             get
@@ -1119,6 +1123,8 @@ namespace QWellApp.ViewModels
                 OnPropertyChanged(nameof(MedicineList));
             }
         }
+        #endregion
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
@@ -1150,6 +1156,8 @@ namespace QWellApp.ViewModels
             EmployeeList = new Dictionary<int, string>();
             NurseList = new Dictionary<int, string>();
             MedicineList = new Dictionary<int, string>();
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
             GetProcedureRecordDetails = new RelayCommand(ExecuteGetProcedureRecordDetailsCommand, CanExecuteGetUserDetailsCommand);
             UpdateProcedureRecordCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteForAdminsCommand);
@@ -1223,9 +1231,29 @@ namespace QWellApp.ViewModels
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = procedureRecordRepository.GetByID(SelectedId);
+            var oldMedicine = productMedicalRecordRepository.GetAll(SelectedId, RecordTypeEnum.Procedure);
             var deleteSuccess = procedureRecordRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Transform oldMedicine list to remove unwanted properties
+                var filteredOldMedicineData = oldMedicine.Select(m => new
+                {
+                    m.Id,
+                    m.ProductId,
+                    m.Units,
+                    m.SoldPrice
+                }).ToList();
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.ProcedureRecords,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredOldMedicineData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadProcedureRecordList("");
             }
         }
@@ -1576,9 +1604,40 @@ namespace QWellApp.ViewModels
                         }
                     }
                 }
+                var oldData = procedureRecordRepository.GetByID(updateProcedureRecord.Id);
+                var oldMedicine = productMedicalRecordRepository.GetAll(updateProcedureRecord.Id, RecordTypeEnum.Procedure);
                 bool editSuccess = procedureRecordRepository.Edit(updateProcedureRecord, medDoseIds);
                 if (editSuccess)
                 {
+                    var newMedicine = productMedicalRecordRepository.GetAll(updateProcedureRecord.Id, RecordTypeEnum.Procedure);
+                    // Transform newMedicine list to remove unwanted properties
+                    var filteredNewMedicineData = newMedicine.Select(m => new
+                    {
+                        m.Id,
+                        m.ProductId,
+                        m.Units,
+                        m.SoldPrice
+                    }).ToList();
+
+                    // Transform oldMedicine list to remove unwanted properties
+                    var filteredOldMedicineData = oldMedicine.Select(m => new
+                    {
+                        m.Id,
+                        m.ProductId,
+                        m.Units,
+                        m.SoldPrice
+                    }).ToList();
+
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.ProcedureRecords,
+                        AffectedEntityId = updateProcedureRecord.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredOldMedicineData),
+                        NewValues = JsonConvert.SerializeObject(updateProcedureRecord) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredNewMedicineData),
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     ProcedureRecordListVisibility = true;
                     CreateGridVisibility = false;

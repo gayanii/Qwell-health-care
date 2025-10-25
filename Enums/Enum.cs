@@ -11,7 +11,8 @@ namespace QWellApp.Enums
     {
         Medical = 1,
         Lab = 2,
-        Procedure = 3
+        Procedure = 3,
+        Channel = 4
     }
 
     public enum UserStatusEnum
@@ -33,5 +34,50 @@ namespace QWellApp.Enums
 
         [Description("Staff")]
         Staff
+    }
+
+    public enum ActionTypeEnum
+    {
+        [Description("Update")]
+        Update,
+
+        [Description("Add")]
+        Add,
+
+        [Description("Delete")]
+        Delete
+    }
+
+    public enum EntitiesEnum
+    {
+        [Description("Products")]
+        Products,
+
+        [Description("Product Records")]
+        ProductRecords,
+
+        [Description("Suppliers")]
+        Suppliers,
+
+        [Description("Medical Records")]
+        MedicalRecords,
+
+        [Description("Procedure Records")]
+        ProcedureRecords,
+
+        [Description("Lab Records")]
+        LabRecords,
+
+        [Description("Channel Records")]
+        ChannelRecords,
+
+        [Description("Employees")]
+        Employees,
+
+        [Description("Patients")]
+        Patients,
+
+        [Description("Lab Tests")]
+        LabTests,
     }
 }

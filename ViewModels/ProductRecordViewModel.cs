@@ -1,4 +1,5 @@
-﻿using QWellApp.Enums;
+﻿using Newtonsoft.Json;
+using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
 using QWellApp.ViewModels.Common;
@@ -54,6 +55,8 @@ namespace QWellApp.ViewModels
         private IProductRepository productRepository;
         private IProductRecordRepository productRecordRepository;
         private ISupplierRepository supplierRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
         //Properties 
         public int SelectedId
@@ -444,6 +447,8 @@ namespace QWellApp.ViewModels
             userRepository = new UserRepository();
             supplierRepository = new SupplierRepository();
             LoadProductList(SearchWord);
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
             GetProductRecordDetails = new RelayCommand(ExecuteGetProductRecordDetailsCommand, CanExecuteGetProductRecordDetailsCommand);
             UpdateProductRecordCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteForAdminsCommand);
@@ -490,9 +495,35 @@ namespace QWellApp.ViewModels
         }
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = productRecordRepository.GetByID(SelectedId);
             var deleteSuccess = productRecordRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.ProductRecords,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(new
+                    {
+                        oldData.Id,
+                        oldData.Barcode,
+                        oldData.ProductId,
+                        Product = (object?)null,
+                        oldData.SupplierPrice,
+                        oldData.SellingPrice,
+                        oldData.OrderedQuantity,
+                        oldData.ExpDate,
+                        oldData.ReceivedDate,
+                        oldData.SupplierId,
+                        Supplier = (object?)null,
+                        oldData.UserId,
+                        User = (object?)null,
+                    }),
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadProductList("");
             }
         }
@@ -564,6 +595,16 @@ namespace QWellApp.ViewModels
                 var createSuccess = productRecordRepository.Add(createProductRecord);
                 if (createSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.ProductRecords,
+                        AffectedEntityId = createProductRecord.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(createProductRecord)
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     ProductListVisibility = true;
                     CreateGridVisibility = false;
@@ -651,9 +692,36 @@ namespace QWellApp.ViewModels
                     UserId = user.Id,
                     ReceivedDate = ReceivedDate
                 };
+                var oldData = productRecordRepository.GetByID(updateProductRecord.Id);
                 bool editSuccess = productRecordRepository.Edit(updateProductRecord);
                 if (editSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.ProductRecords,
+                        AffectedEntityId = updateProductRecord.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        //OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                        OldValues = JsonConvert.SerializeObject(new
+                        {
+                            oldData.Id,
+                            oldData.Barcode,
+                            oldData.ProductId,
+                            Product = (object?)null,
+                            oldData.SupplierPrice,
+                            oldData.SellingPrice,
+                            oldData.OrderedQuantity,
+                            oldData.ExpDate,
+                            oldData.ReceivedDate,
+                            oldData.SupplierId,
+                            Supplier = (object?)null,
+                            oldData.UserId,
+                            User = (object?)null,
+                        }),
+                        NewValues = JsonConvert.SerializeObject(updateProductRecord) // Serialize the whole object
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     ProductListVisibility = true;
                     CreateGridVisibility = false;

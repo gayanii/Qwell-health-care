@@ -177,8 +177,8 @@
                     <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding LastNameErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Username *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="5" Margin="30 0 0 10" Text="{Binding UsernameErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="6" Text="Email Address" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="6" Text="Email Address *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="7" Margin="30 0 0 10" Text="{Binding EmailErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="8" Text="Employee Type" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="9" Text="" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="10" Text="Employee Role" Style="{StaticResource text}"/>
@@ -187,7 +187,7 @@
                     <uc:TextBoxUserControl x:Name="FirstName" Grid.Column="1" Grid.Row="0" Hint="Enter first name" Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="LastName" Grid.Column="1" Grid.Row="2" Hint="Enter last name" Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="Username" Grid.Column="1" Grid.Row="4" Hint="Enter username" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="Email" Grid.Column="1" Grid.Row="6" Hint="KarimDoe@email.com" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="Email" Grid.Column="1" Grid.Row="6" Hint="KarimDoe@email.com" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"/>
                     <ComboBox x:Name="Type" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding EmployeeTypeList}" Text="{Binding EmployeeType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686"/>
                     <ComboBox x:Name="Role" Grid.Column="1" Grid.Row="10" ItemsSource="{Binding RoleList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686" />
 
@@ -312,8 +312,8 @@
                     <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding LastNameErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Username *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="5" Text="{Binding UsernameErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="6" Text="Email Address" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="6" Text="Email Address *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="7" Margin="30 0 0 10" Text="{Binding EmailErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="8" Text="Employee Type" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="9" Text="" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="10" Text="Employee Role" Style="{StaticResource text}"/>
@@ -322,7 +322,7 @@
                     <uc:TextBoxUserControl x:Name="FirstNameCreate" Grid.Column="1" Grid.Row="0" Hint="Enter first name" Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="LastNameCreate" Grid.Column="1" Grid.Row="2" Hint="Enter last name" Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="UsernameCreate" Grid.Column="1" Grid.Row="4" Hint="Enter username" Text="{Binding Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="EmailCreate" Grid.Column="1" Grid.Row="6" Hint="KarimDoe@email.com" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="EmailCreate" Grid.Column="1" Grid.Row="6" Hint="KarimDoe@email.com" Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"/>
                     <ComboBox x:Name="TypeCreate" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding EmployeeTypeList}" Text="{Binding EmployeeType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686"/>
                     <ComboBox x:Name="RoleCreate" Grid.Column="1" Grid.Row="10" ItemsSource="{Binding RoleList}" DisplayMemberPath="Value" SelectedValuePath="Key" Text="{Binding Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686" />
 

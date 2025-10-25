@@ -41,15 +41,23 @@ namespace QWellApp.Repositories
                     if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Medical) {
                         recordExists = context.MedicalRecords.Any(mr => mr.Id == productMedicalRecordModel.MedicalRecordId);
                     }
+
                     // Check if the LabRecord exists
                     if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Lab)
                     {
                         recordExists = context.LabRecords.Any(mr => mr.Id == productMedicalRecordModel.LabRecordId);
                     }
+
                     // Check if the ProcedureRecord exists
                     if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Procedure)
                     {
                         recordExists = context.ProcedureRecords.Any(mr => mr.Id == productMedicalRecordModel.ProcedureRecordId);
+                    }
+
+                    // Check if the ChannelRecord exists
+                    if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Channel)
+                    {
+                        recordExists = context.ChannelRecords.Any(mr => mr.Id == productMedicalRecordModel.ChannelRecordId);
                     }
 
                     if (!recordExists)
@@ -68,6 +76,7 @@ namespace QWellApp.Repositories
                         MedicalRecordId = productMedicalRecordModel.MedicalRecordId,
                         LabRecordId = productMedicalRecordModel.LabRecordId,
                         ProcedureRecordId = productMedicalRecordModel.ProcedureRecordId,
+                        ChannelRecordId = productMedicalRecordModel.ChannelRecordId,
                         RecordType = productMedicalRecordModel.RecordType,
                         RecordTypeId = productMedicalRecordModel.RecordTypeId
                     };
@@ -86,7 +95,6 @@ namespace QWellApp.Repositories
                 return false;
             }
         }
-
 
         public bool Edit(ProductMedicalRecord productMedicalRecordModel)
         {
@@ -116,15 +124,23 @@ namespace QWellApp.Repositories
                     {
                         recordExists = context.MedicalRecords.Any(mr => mr.Id == productMedicalRecordModel.MedicalRecordId);
                     }
+
                     // Check if the LabRecord exists
                     if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Lab)
                     {
                         recordExists = context.LabRecords.Any(mr => mr.Id == productMedicalRecordModel.LabRecordId);
                     }
+
                     // Check if the ProcedureRecord exists
                     if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Procedure)
                     {
                         recordExists = context.ProcedureRecords.Any(mr => mr.Id == productMedicalRecordModel.ProcedureRecordId);
+                    }
+
+                    // Check if the ChannelRecord exists
+                    if (productMedicalRecordModel.RecordTypeId == (int)RecordTypeEnum.Channel)
+                    {
+                        recordExists = context.ChannelRecords.Any(mr => mr.Id == productMedicalRecordModel.ChannelRecordId);
                     }
 
                     if (!recordExists)
@@ -141,6 +157,7 @@ namespace QWellApp.Repositories
                     productMedicalRecord.MedicalRecordId = productMedicalRecordModel.MedicalRecordId;
                     productMedicalRecord.LabRecordId = productMedicalRecordModel.LabRecordId;
                     productMedicalRecord.ProcedureRecordId = productMedicalRecordModel.ProcedureRecordId;
+                    productMedicalRecord.ChannelRecordId = productMedicalRecordModel.ChannelRecordId;
                     productMedicalRecord.RecordTypeId = productMedicalRecordModel.RecordTypeId;
 
                     // Mark the entity as modified and save changes
@@ -189,6 +206,16 @@ namespace QWellApp.Repositories
                         // Fetch medical doses related to the specified procedure record ID
                         productMedicalRecords = context.ProductMedicalRecords
                             .Where(m => m.ProcedureRecordId == recordId && m.RecordTypeId == (int)recordTypeId)
+                            .Include(m => m.Product)  // Include related Product if necessary
+                            .ToList();
+                    }
+
+                    // Check if the ChannelRecord exists
+                    if (recordTypeId == RecordTypeEnum.Channel)
+                    {
+                        // Fetch medical doses related to the specified channel record ID
+                        productMedicalRecords = context.ProductMedicalRecords
+                            .Where(m => m.ChannelRecordId == recordId && m.RecordTypeId == (int)recordTypeId)
                             .Include(m => m.Product)  // Include related Product if necessary
                             .ToList();
                     }
@@ -326,10 +353,37 @@ namespace QWellApp.Repositories
                 return false;
             }
         }
-        /*
-        MedicineId = ,
-        TimePeriod = ,
-        MedicalDoseId = 
-         */
+
+        public bool RemoveChannelRecord(int id)
+        {
+            try
+            {
+                using (AppDataContext context = new AppDataContext())
+                {
+                    var records = context.ProductMedicalRecords.Where(x => x.ChannelRecordId.Equals(id));
+                    if (records == null)
+                    {
+                        MessageBox.Show("Channel record does not exist. Please check the ID.");
+                        return false;
+                    }
+
+                    foreach (var record in records)
+                    {
+                        context.ProductMedicalRecords.Remove(record);
+
+                        //Add product current quantities
+                        productRepository.EditCurrentQuantityOnly(record.ProductId, record.Units);
+                    }
+                    context.SaveChanges();
+                    //MessageBox.Show("Deleted Successfully!");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+                return false;
+            }
+        }
     }
 }

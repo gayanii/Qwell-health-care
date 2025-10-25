@@ -112,7 +112,7 @@ namespace QWellApp.Repositories
                         .Where(p => p.CompanyName.ToLower().Contains(normalizedSearchWord) || p.Status.ToLower().Contains(normalizedSearchWord) ||
                         p.Address.ToLower().Contains(normalizedSearchWord) || p.TelephoneNum.Contains(normalizedSearchWord) ||
                         p.Email.Contains(normalizedSearchWord))
-                        .OrderBy(p => p.CompanyName) // Sort by id in descending order. recent up
+                        .OrderBy(p => p.CompanyName) // Sort companyname in ascending order
                         .ToList();
                     foreach (var supplier in supplierList)
                     {
