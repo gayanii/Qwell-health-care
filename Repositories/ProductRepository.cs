@@ -156,7 +156,7 @@ namespace QWellApp.Repositories
                     var productList = context.Products
                         .Where(p => p.BrandName.ToLower().Contains(normalizedSearchWord) || p.Generic.ToLower().Contains(normalizedSearchWord) || p.Status.ToLower().Contains(normalizedSearchWord) ||
                         p.CurrentQuantity.ToString().Contains(normalizedSearchWord) || p.SellingPrice.ToString().Contains(normalizedSearchWord))
-                        .OrderBy(p => p.BrandName) // Sort by brand name in descending order. recent up
+                        .OrderBy(p => p.BrandName) // Sort brandname in ascending order
                         .ToList();
 
                     // Convert each product in the filtered list to the ProductView object

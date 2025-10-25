@@ -38,7 +38,7 @@ namespace QWellApp.Models
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string? Email { get; set; }
+        public string Email { get; set; }
         public string MobileNum { get; set; }
         public string? TelephoneNum { get; set; }
         public string Gender { get; set; }
@@ -59,6 +59,12 @@ namespace QWellApp.Models
     public class UserAccount
     {
         public string Username { get; set; }
+    }
+
+    public class ChangePassword
+    {
+        public string Username { get; set; }
+        public string NewPassword { get; set; }
     }
 
     public class UserView

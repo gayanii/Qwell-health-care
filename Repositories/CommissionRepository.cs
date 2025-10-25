@@ -137,6 +137,47 @@ namespace QWellApp.Repositories
             }
         }
 
+        public async Task<IEnumerable<Commission>> GetChannelCommissions(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                using (AppDataContext context = new AppDataContext())
+                {
+                    // Calculate the start and end dates based on the summary date
+                    DateTime ComStartDate = startDate.AddHours(7);  // 10/20/2024 7:00:00 AM
+                    DateTime ComEndDate = endDate.AddDays(1).AddHours(6).AddMinutes(59); // 10/21/2024 6:59:00 AM
+
+                    List<ChannelRecord> channelRecords = context.ChannelRecords
+                        .Include(x => x.Doctor)
+                        .Include(x => x.Doctor.Role)
+                        .Include(x => x.Nurse1)
+                        .Include(x => x.Nurse1!.Role)
+                        .Include(x => x.Nurse2)
+                        .Include(x => x.Nurse2!.Role)
+                        .Where(x => x.AdmitDate >= ComStartDate && x.AdmitDate < ComEndDate)
+                        .OrderByDescending(p => p.AdmitDate) // Sort by AdmitDate in descending order. recent up
+                        .ToList();
+                    List<Commission> CommissionList = new List<Commission>();
+
+
+                    // Process each medical record
+                    foreach (var channelRecord in channelRecords)
+                    {
+                        AddOrUpdateCommission(channelRecord.Doctor, channelRecord.DocComm, channelRecord.ChitNumber, channelRecord.AdmitDate, CommissionList);
+                        AddOrUpdateCommission(channelRecord.Nurse1, channelRecord.Nurse1Comm, channelRecord.ChitNumber, channelRecord.AdmitDate, CommissionList);
+                        AddOrUpdateCommission(channelRecord.Nurse2, channelRecord.Nurse2Comm, channelRecord.ChitNumber, channelRecord.AdmitDate, CommissionList);
+                    }
+
+                    return CommissionList;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+                throw;
+            }
+        }
+
         // Helper method to add or update commission entries
         void AddOrUpdateCommission(User? user, float commissionAmount, string chitNumber, DateTime admitDate, List<Commission> CommissionList)
         {

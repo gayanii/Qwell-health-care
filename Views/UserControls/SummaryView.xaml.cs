@@ -38,6 +38,7 @@ namespace QWellApp.Views.UserControls
         private readonly List<string> LabSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "Lab Bill", "Lab Paid Cost", "Consultation Fee", "Consumable Charges", "Total Commissions", "Total Bill"};
         private readonly List<string> ProcedureSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "OPD Charge", "Procedure Bill", "Consultation Fee", "Other Charges", "Total Commissions", "Total Bill" };
         private readonly List<string> MedicalSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "OPD Charge", "Pharmacy Bill", "Consultation Fee", "Other Charges", "Total Commissions", "Total Bill" };
+        private readonly List<string> ChannelSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "OPD Charge", "Pharmacy Bill", "Consultation Fee", "Other Charges", "Total Commissions", "Total Bill" };
 
         Func<dynamic, List<string>> extractLabRowData = summary => new List<string>
                     {
@@ -72,6 +73,19 @@ namespace QWellApp.Views.UserControls
                         summary.AdmitDate.ToString(),
                         summary.OPDCharge.ToString(),
                         summary.ProcedureBill.ToString(),
+                        summary.ConsultantFee.ToString(),
+                        summary.OtherCharges.ToString(),
+                        summary.TotalCommisions.ToString(),
+                        summary.TotalBill.ToString()
+                    };
+
+        Func<dynamic, List<string>> extractChannelRowData = summary => new List<string>
+                    {
+                        summary.Id.ToString(),
+                        summary.ChitNumber,
+                        summary.AdmitDate.ToString(),
+                        summary.OPDCharge.ToString(),
+                        summary.PharmacyBill.ToString(),
                         summary.ConsultantFee.ToString(),
                         summary.OtherCharges.ToString(),
                         summary.TotalCommisions.ToString(),
@@ -269,11 +283,72 @@ namespace QWellApp.Views.UserControls
             }
         }
 
+        private void DownloadChannelReportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (summaryViewModel.ChannelSummaryList == null || summaryViewModel.ChannelSummaryList.Count() == 0)
+            {
+                MessageBox.Show("No summary available to export.");
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "PDF Files (*.pdf)|*.pdf",
+                FileName = $"QWell-Channel-Summary-{summaryViewModel.StartDate.ToString("dd-MM-yyyy")}-to-{summaryViewModel.EndDate.ToString("dd-MM-yyyy")}.pdf"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Generate document using ExportToPDF
+                    var document = ExportToPDF(
+                    saveFileDialog.FileName,
+                    $"Channel Report - (From {summaryViewModel.StartDate:dd-MM-yyyy} 7.00AM to {summaryViewModel.EndDate.AddDays(1):dd-MM-yyyy} 6.59AM)");
+
+                    var numberofRecords = new iText.Layout.Element.Paragraph($"Number of Patients: {summaryViewModel.MedicalSummaryList.Count()}")
+                       .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT) // Align text left
+                       .SetFontSize(14)
+                       .SetMarginTop(10)
+                       .SetMarginBottom(10);
+
+                    document.Add(numberofRecords);
+
+                    // Add Table1 (Detailed Data Table)
+                    var table1 = Table1(ChannelSummarytableHeaders, summaryViewModel.MedicalSummaryList, extractChannelRowData, new iText.Layout.Element.Table(ChannelSummarytableHeaders.Count));
+                    document.Add(table1.SetMarginBottom(10));
+
+                    var spacerText = new iText.Layout.Element.Paragraph("Total Summary")
+                       .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER) // Align text center
+                       .SetFontSize(14)
+                       .SetBold()
+                       .SetMarginTop(10)
+                       .SetMarginBottom(10);
+
+                    document.Add(spacerText); // Add the text to the document
+
+                    // Add Table2 (Summary Table)
+                    var table2 = Table2(summaryViewModel.ChannelReportSummary, new iText.Layout.Element.Table(4));
+                    document.Add(table2);
+
+                    // Close the document after adding all content
+                    document.Close();
+
+                    MessageBox.Show("PDF exported successfully!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred: " + ex.Message);
+                }
+            }
+        }
+
         private void DownloadFullReportButton_Click(object sender, RoutedEventArgs e)
         {
             if ((summaryViewModel.MedicalSummaryList == null || summaryViewModel.MedicalSummaryList.Count() == 0) &&
                 (summaryViewModel.ProcedureSummaryList == null || summaryViewModel.ProcedureSummaryList.Count() == 0) && 
-                (summaryViewModel.LabSummaryList == null || summaryViewModel.LabSummaryList.Count() == 0))
+                (summaryViewModel.LabSummaryList == null || summaryViewModel.LabSummaryList.Count() == 0) &&
+                (summaryViewModel.ChannelSummaryList == null || summaryViewModel.ChannelSummaryList.Count() == 0))
             {
                 MessageBox.Show("No summary available to export.");
                 return;
@@ -357,6 +432,31 @@ namespace QWellApp.Views.UserControls
                     var table3 = Table1(LabSummarytableHeaders, summaryViewModel.LabSummaryList, extractLabRowData, new iText.Layout.Element.Table(LabSummarytableHeaders.Count));
                     document.Add(table3.SetMarginBottom(10));
 
+                    // Add Table4 (Summary Table)
+                    var table4 = Table2(summaryViewModel.FullReportSummary, new iText.Layout.Element.Table(4));
+                    document.Add(table4);
+
+                    var spacerText5 = new iText.Layout.Element.Paragraph("Summary of the channelling records")
+                       .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER) // Align text center
+                       .SetFontSize(14)
+                       .SetBold()
+                       .SetMarginTop(10)
+                       .SetMarginBottom(10);
+
+                    document.Add(spacerText5); // Add the text to the document
+
+                    var numberofChannelRecords = new iText.Layout.Element.Paragraph($"Number of Patients: {summaryViewModel.ChannelSummaryList.Count()}")
+                       .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT) // Align text left
+                       .SetFontSize(14)
+                       .SetMarginTop(10)
+                       .SetMarginBottom(10);
+
+                    document.Add(numberofChannelRecords);
+
+                    // Add Table1 (Medical Detailed Data Table)
+                    var table5 = Table1(ChannelSummarytableHeaders, summaryViewModel.ChannelSummaryList, extractChannelRowData, new iText.Layout.Element.Table(ChannelSummarytableHeaders.Count));
+                    document.Add(table1.SetMarginBottom(10));
+
                     var spacerText = new iText.Layout.Element.Paragraph("Total Summary")
                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER) // Align text center
                        .SetFontSize(14)
@@ -374,10 +474,6 @@ namespace QWellApp.Views.UserControls
                        .SetMarginBottom(10);
 
                     document.Add(numberofRecords);
-
-                    // Add Table2 (Summary Table)
-                    var table4 = Table2(summaryViewModel.FullReportSummary, new iText.Layout.Element.Table(4));
-                    document.Add(table4);
 
                     // Close the document after adding all content
                     document.Close();

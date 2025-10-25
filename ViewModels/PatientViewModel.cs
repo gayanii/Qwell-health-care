@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
+using Newtonsoft.Json;
 using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
@@ -50,6 +51,8 @@ namespace QWellApp.ViewModels
 
         private IPatientRepository patientRepository;
         private IUserRepository userRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
         public IEnumerable<PatientView> PatientList
         {
@@ -444,6 +447,8 @@ namespace QWellApp.ViewModels
             userRepository = new UserRepository();
             StatusList = new List<string>() { UserStatusEnum.Active.ToString(), UserStatusEnum.Inactive.ToString() };
             LoadPatientList(SearchWord);
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
             GetPatientDetails = new RelayCommand(ExecuteGetUserDetailsCommand, CanExecuteGetUserDetailsCommand);
             UpdatePatientCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteForAdminsCommand);
@@ -457,9 +462,21 @@ namespace QWellApp.ViewModels
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = patientRepository.GetByID(SelectedId);
             var deleteSuccess = patientRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.Patients,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
+
                 LoadPatientList("");
             }
         }
@@ -497,13 +514,12 @@ namespace QWellApp.ViewModels
         private void ExecuteCreateCommand(object obj)
         {
             if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Gender) || 
-                string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(NIC) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
+                string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
             {
                 FirstNameErrorMessage = (string.IsNullOrWhiteSpace(FirstName)) ? "First name is required." : "";
                 LastNameErrorMessage = (string.IsNullOrWhiteSpace(LastName)) ? "Last name is required." : "";
                 AgeErrorMessage = (string.IsNullOrWhiteSpace(Age)) ? "Age is required." : "";
                 GenderErrorMessage = (string.IsNullOrWhiteSpace(Gender)) ? "Gender is required." : "";
-                NICErrorMessage = (string.IsNullOrWhiteSpace(NIC)) ? "NIC is required." : "";
                 MobileNumErrorMessage = (string.IsNullOrWhiteSpace(Mobile)) ? "Mobile number is required." : (Mobile.Length != 10) ? "Should have 10 characters." : "";
             }
             else
@@ -516,13 +532,23 @@ namespace QWellApp.ViewModels
                     TelephoneNum = Telephone,
                     Gender = Gender,
                     Age = Age,
-                    NIC = NIC,
+                    NIC = NIC ?? null,
                     AllergicHistory = AllergicHistory,
                     Weight = Weight,
                 };
                 var createSuccess = patientRepository.Add(createPatient);
                 if (createSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Patients,
+                        AffectedEntityId = createPatient.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(createPatient)
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     PatientListVisibility = true;
                     CreateGridVisibility = false;
@@ -580,13 +606,12 @@ namespace QWellApp.ViewModels
         private void ExecuteUpdateCommand(object obj)
         {
             if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Gender) ||
-                string.IsNullOrWhiteSpace(Age)  || string.IsNullOrWhiteSpace(NIC) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
+                string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
             {
                 FirstNameErrorMessage = (string.IsNullOrWhiteSpace(FirstName)) ? "First name is required." : "";
                 LastNameErrorMessage = (string.IsNullOrWhiteSpace(LastName)) ? "Last name is required." : "";
                 AgeErrorMessage = (string.IsNullOrWhiteSpace(Age)) ? "Age is required." : "";
                 GenderErrorMessage = (string.IsNullOrWhiteSpace(Gender)) ? "Gender is required." : "";
-                NICErrorMessage = (string.IsNullOrWhiteSpace(NIC)) ? "NIC is required." : "";
                 MobileNumErrorMessage = (string.IsNullOrWhiteSpace(Mobile)) ? "Mobile number is required." : (Mobile.Length != 10) ? "Should have 10 characters." : "";
             }
             else
@@ -600,14 +625,26 @@ namespace QWellApp.ViewModels
                     TelephoneNum = (Telephone == "") ? null : Telephone,
                     Gender = Gender,
                     Age = Age,
-                    NIC = NIC,
+                    NIC = NIC ?? null,
                     AllergicHistory = (AllergicHistory == "") ? null : AllergicHistory,
                     Weight = (Weight == "") ? null : Weight,
                     Status = (Status == "") ? UserStatusEnum.Active.ToString() : Status,
                 };
+                var oldData = patientRepository.GetByID(updatePatient.Id);
                 bool editSuccess = patientRepository.Edit(updatePatient);
                 if (editSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Patients,
+                        AffectedEntityId = updatePatient.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                        NewValues = JsonConvert.SerializeObject(updatePatient) // Serialize the whole object
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
+
                     UpdateGridVisibility = false;
                     PatientListVisibility = true;
                     CreateGridVisibility = false;

@@ -1,4 +1,5 @@
-﻿using QWellApp.Enums;
+﻿using Newtonsoft.Json;
+using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
 using QWellApp.UserControls;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,6 +41,7 @@ namespace QWellApp.ViewModels
         private string _firstNameErrorMessage;
         private string _lastNameErrorMessage;
         private string _usernameErrorMessage;
+        private string _emailErrorMessage;
         private string _genderErrorMessage;
         private string _mobileNumErrorMessage;
         private string _passwordErrorMessage;
@@ -61,7 +64,9 @@ namespace QWellApp.ViewModels
         private bool _refresh = false;
 
         private IUserRepository userRepository;
+        private IActivityLogRepository activityLogRepository;
         private IRoleRepository roleRepository;
+        private UserDetails currentUser;
 
         //Properties 
         public string SearchWord
@@ -259,6 +264,21 @@ namespace QWellApp.ViewModels
                 OnPropertyChanged(nameof(UsernameErrorMessage));
             }
         }
+
+        public string EmailErrorMessage
+        {
+            get
+            {
+                return _emailErrorMessage;
+            }
+
+            set
+            {
+                _emailErrorMessage = value;
+                OnPropertyChanged(nameof(EmailErrorMessage));
+            }
+        }
+
         public string GenderErrorMessage
         {
             get
@@ -549,6 +569,7 @@ namespace QWellApp.ViewModels
             StatusList = new List<string>() { UserStatusEnum.Active.ToString(), UserStatusEnum.Inactive.ToString() };
             userRepository = new UserRepository();
             roleRepository = new RoleRepository();
+            activityLogRepository = new ActivityLogRepository();
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
             GetUserDetails = new RelayCommand(ExecuteGetUserDetailsCommand, CanExecuteGetUserDetailsCommand);
             UpdateUserCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteForAdminsCommand);
@@ -560,13 +581,25 @@ namespace QWellApp.ViewModels
             //LoadUserList(SearchWord);
             LoadPositionList();
             ButtonVisibility();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
         }
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = userRepository.GetByID(SelectedId);
             var deleteSuccess = userRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.Employees,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadUserList("");
             }
         }
@@ -602,6 +635,7 @@ namespace QWellApp.ViewModels
             FirstNameErrorMessage = "";
             LastNameErrorMessage = "";
             UsernameErrorMessage = "";
+            EmailErrorMessage = "";
             GenderErrorMessage = "";
             MobileNumErrorMessage = "";
             PasswordErrorMessage = "";
@@ -632,14 +666,17 @@ namespace QWellApp.ViewModels
 
         private void ExecuteCreateCommand(object obj)
         {
-            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Username) || 
-                string.IsNullOrWhiteSpace(Gender) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10 || 
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // Regex for email validation
+
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Email) ||
+                !Regex.IsMatch(Email, emailPattern) || string.IsNullOrWhiteSpace(Gender) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10 || 
                 string.IsNullOrWhiteSpace(new System.Net.NetworkCredential(string.Empty, Password).Password) ||
                 string.IsNullOrWhiteSpace(new System.Net.NetworkCredential(string.Empty, ConfirmPassword).Password))
             {
                 FirstNameErrorMessage = (string.IsNullOrWhiteSpace(FirstName)) ? "First name is required." : "";
                 LastNameErrorMessage = (string.IsNullOrWhiteSpace(LastName)) ? "Last name is required." : "";
                 UsernameErrorMessage = (string.IsNullOrWhiteSpace(Username)) ? "Username is required." : (Username.Length < 3) ? "Username should have atleast 3 characters." : "";
+                EmailErrorMessage = string.IsNullOrWhiteSpace(Email) ? "Email is required." : (!Regex.IsMatch(Email, emailPattern) ? "Invalid email format." : ""); // Validate email format
                 GenderErrorMessage = (string.IsNullOrWhiteSpace(Gender)) ? "Gender is required." : "";
                 MobileNumErrorMessage = (string.IsNullOrWhiteSpace(Mobile)) ? "Mobile number is required." : (Mobile.Length != 10) ? "Mobile number should have 10 characters." : "";
                 PasswordErrorMessage = (string.IsNullOrWhiteSpace(new System.Net.NetworkCredential(string.Empty, Password).Password)) ? "Password is required." : (Password.Length < 3) ? "Password should have atleast 3 characters." : "";
@@ -672,6 +709,28 @@ namespace QWellApp.ViewModels
                 var createSuccess = userRepository.Add(createUser);
                 if (createSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Employees,
+                        AffectedEntityId = createUser.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(new
+                        {
+                            createUser.FirstName,
+                            createUser.LastName,
+                            createUser.Email,
+                            createUser.MobileNum,
+                            createUser.TelephoneNum,
+                            createUser.Username,
+                            createUser.NIC,
+                            createUser.EmployeeType,
+                            createUser.RoleId,
+                            createUser.Gender
+                        }) // Excludes Password manually
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     UserListVisibility = true;
                     CreateGridVisibility = false;
@@ -741,11 +800,15 @@ namespace QWellApp.ViewModels
 
         private void ExecuteUpdateCommand(object obj)
         {
-            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Gender) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // Regex for email validation
+
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Email) ||
+                !Regex.IsMatch(Email, emailPattern) || string.IsNullOrWhiteSpace(Gender) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
             {
                 FirstNameErrorMessage = (string.IsNullOrWhiteSpace(FirstName)) ? "First name is required." : "";
                 LastNameErrorMessage = (string.IsNullOrWhiteSpace(LastName)) ? "Last name is required." : "";
                 UsernameErrorMessage = (string.IsNullOrWhiteSpace(Username)) ? "Username is required." : (Username.Length < 3) ? "Username should have atleast 3 characters." : "";
+                EmailErrorMessage = string.IsNullOrWhiteSpace(Email) ? "Email is required." : (!Regex.IsMatch(Email, emailPattern) ? "Invalid email format." : ""); // Validate email format
                 GenderErrorMessage = (string.IsNullOrWhiteSpace(Gender)) ? "Gender is required." : "";
                 MobileNumErrorMessage = (string.IsNullOrWhiteSpace(Mobile)) ? "Mobile number is required." : (Mobile.Length != 10) ? "Mobile number should have 10 characters." : "";
             }
@@ -766,9 +829,21 @@ namespace QWellApp.ViewModels
                     Gender = (Gender == "") ? null : Gender,
                     Status = (EmployeeStatus == "") ? UserStatusEnum.Active.ToString() : EmployeeStatus,
                 };
+                var oldData = userRepository.GetByID(updateUser.Id);
                 bool editSuccess = userRepository.Edit(updateUser);
                 if (editSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Employees,
+                        AffectedEntityId = updateUser.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                        NewValues = JsonConvert.SerializeObject(updateUser) // Serialize the whole object
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
+
                     UpdateGridVisibility = false;
                     UserListVisibility = true;
                     CreateGridVisibility = false;

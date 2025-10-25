@@ -48,6 +48,18 @@ namespace QWell
         {
             this.WindowState = WindowState.Minimized;
         }
+        private void UserButton_Click(object sender, RoutedEventArgs e)
+        {
+            //UserPopup.IsDropDownOpen = true; // Opens the ComboBox dropdown
+            UserPopup.IsOpen = !UserPopup.IsOpen; // Toggle popup visibility
+        }
+
+        private void ChangePassword_Click(object sender, RoutedEventArgs e)
+        {
+            //UserPopup.IsDropDownOpen = false; // Close the dropdown after clicking
+            UserPopup.IsOpen = false; // Close popup after clicking
+        }
+
         private void btnMaximize_Click(object sender, RoutedEventArgs e)
         {
             if (this.WindowState == WindowState.Normal)

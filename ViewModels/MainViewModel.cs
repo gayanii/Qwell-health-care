@@ -103,11 +103,14 @@ namespace QWellApp.ViewModels
         public ICommand ShowProcedureRecordViewCommand { get; }
         public ICommand ShowLabTestViewCommand { get; }
         public ICommand ShowLabRecordViewCommand { get; }
+        public ICommand ShowChannelRecordViewCommand { get; }
         public ICommand ShowMedicalCommissionViewCommand { get; }
         public ICommand ShowLabCommissionViewCommand { get; }
         public ICommand ShowProcedureCommissionViewCommand { get; }
         public ICommand ShowSummaryViewCommand { get; }
+        public ICommand ShowActivityLogsViewCommand { get; }
         public ICommand LogoutCommand { get; }
+        public ICommand ShowChangePasswordViewCommand { get; }
 
         public MainViewModel()
         {
@@ -125,11 +128,14 @@ namespace QWellApp.ViewModels
             ShowProcedureRecordViewCommand = new RelayCommand(ExecuteShowProcedureRecordViewCommand);
             ShowLabTestViewCommand = new RelayCommand(ExecuteShowLabTestViewCommand);
             ShowLabRecordViewCommand = new RelayCommand(ExecuteShowLabRecordViewCommand);
+            ShowChannelRecordViewCommand = new RelayCommand(ExecuteShowChannelRecordViewCommand);
             ShowMedicalCommissionViewCommand = new RelayCommand(ExecuteShowMedicalCommissionViewCommand);
             ShowLabCommissionViewCommand = new RelayCommand(ExecuteShowLabCommissionViewCommand);
             ShowProcedureCommissionViewCommand = new RelayCommand(ExecuteShowProcedureCommissionViewCommand);
             ShowSummaryViewCommand = new RelayCommand(ExecuteShowSummaryViewCommand);
+            ShowActivityLogsViewCommand = new RelayCommand(ExecuteShowActivityLogsViewCommand);
             LogoutCommand = new RelayCommand(ExecuteLogoutCommand);
+            ShowChangePasswordViewCommand = new RelayCommand(ExecuteShowChangePasswordViewCommand);
 
             //Default view
             ExecuteShowProductViewCommand(null);
@@ -231,6 +237,14 @@ namespace QWellApp.ViewModels
             Application.Current.Properties["PageName"] = Caption;
         }
 
+        private void ExecuteShowChannelRecordViewCommand(object obj)
+        {
+            CurrentChildView = new ChannelRecordViewModel();
+            Caption = "Channel Records";
+            Icon = IconChar.FileMedical;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
         private void ExecuteShowMedicalCommissionViewCommand(object obj)
         {
             CurrentChildView = new CommissionViewModel();
@@ -260,6 +274,22 @@ namespace QWellApp.ViewModels
             CurrentChildView = new SummaryViewModel();
             Caption = "Summary";
             Icon = IconChar.ClipboardList;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
+        private void ExecuteShowActivityLogsViewCommand(object obj)
+        {
+            CurrentChildView = new ActivityLogViewModel();
+            Caption = "Activity Logs";
+            Icon = IconChar.TruckMedical;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
+        private void ExecuteShowChangePasswordViewCommand(object obj)
+        {
+            CurrentChildView = new ChangePasswordViewModel();
+            Caption = "Change Password";
+            Icon = IconChar.ArrowTrendUp;
             Application.Current.Properties["PageName"] = Caption;
         }
 

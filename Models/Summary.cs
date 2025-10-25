@@ -44,4 +44,17 @@ namespace QWellApp.Models
         public float TotalCommisions { get; set; }
         public float TotalBill { get; set; }
     }
+
+    public class ChannelSummary
+    {
+        public int Id { get; set; }
+        public string ChitNumber { get; set; }
+        public string AdmitDate { get; set; }
+        public float OPDCharge { get; set; }
+        public float PharmacyBill { get; set; }
+        public float ConsultantFee { get; set; }
+        public float OtherCharges { get; set; }
+        public float TotalCommisions { get; set; }
+        public float TotalBill { get; set; }
+    }
 }

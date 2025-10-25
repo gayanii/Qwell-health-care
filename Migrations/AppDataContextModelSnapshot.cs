@@ -22,6 +22,109 @@ namespace QWellApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("QWellApp.Models.ActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AffectedEntity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AffectedEntityId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ActivityLogs");
+                });
+
+            modelBuilder.Entity("QWellApp.Models.ChannelRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AddedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("AdmitDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChitNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float?>("ConsultantFee")
+                        .HasColumnType("real");
+
+                    b.Property<float>("DocComm")
+                        .HasColumnType("real");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Nurse1Comm")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("Nurse1Id")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Nurse2Comm")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("Nurse2Id")
+                        .HasColumnType("int");
+
+                    b.Property<float?>("OPDCharge")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("OtherCharges")
+                        .HasColumnType("real");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("PharmacyBill")
+                        .HasColumnType("real");
+
+                    b.Property<float>("TotalBill")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("Nurse1Id");
+
+                    b.HasIndex("Nurse2Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("ChannelRecords");
+                });
+
             modelBuilder.Entity("QWellApp.Models.LabRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -372,6 +475,9 @@ namespace QWellApp.Migrations
                     b.Property<DateTime>("AdmitDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ChannelRecordId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("LabRecordId")
                         .HasColumnType("int");
 
@@ -394,6 +500,8 @@ namespace QWellApp.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ChannelRecordId");
 
                     b.HasIndex("LabRecordId");
 
@@ -485,6 +593,11 @@ namespace QWellApp.Migrations
                         {
                             Id = 3,
                             TypeName = "Procedure"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            TypeName = "Channel"
                         });
                 });
 
@@ -604,6 +717,7 @@ namespace QWellApp.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeType")
@@ -656,6 +770,48 @@ namespace QWellApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("QWellApp.Models.ActivityLog", b =>
+                {
+                    b.HasOne("QWellApp.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("QWellApp.Models.ChannelRecord", b =>
+                {
+                    b.HasOne("QWellApp.Models.User", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QWellApp.Models.User", "Nurse1")
+                        .WithMany()
+                        .HasForeignKey("Nurse1Id");
+
+                    b.HasOne("QWellApp.Models.User", "Nurse2")
+                        .WithMany()
+                        .HasForeignKey("Nurse2Id");
+
+                    b.HasOne("QWellApp.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Nurse1");
+
+                    b.Navigation("Nurse2");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("QWellApp.Models.LabRecord", b =>
@@ -772,6 +928,11 @@ namespace QWellApp.Migrations
 
             modelBuilder.Entity("QWellApp.Models.ProductMedicalRecord", b =>
                 {
+                    b.HasOne("QWellApp.Models.ChannelRecord", "ChannelRecord")
+                        .WithMany()
+                        .HasForeignKey("ChannelRecordId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("QWellApp.Models.LabRecord", "LabRecord")
                         .WithMany()
                         .HasForeignKey("LabRecordId")
@@ -798,6 +959,8 @@ namespace QWellApp.Migrations
                         .HasForeignKey("RecordTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ChannelRecord");
 
                     b.Navigation("LabRecord");
 

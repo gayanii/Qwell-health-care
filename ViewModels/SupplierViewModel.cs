@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
+using Newtonsoft.Json;
 using QWellApp.Enums;
 using QWellApp.Models;
 using QWellApp.Repositories;
@@ -42,6 +43,8 @@ namespace QWellApp.ViewModels
 
         private ISupplierRepository supplierRepository;
         private IUserRepository userRepository;
+        private IActivityLogRepository activityLogRepository;
+        private UserDetails currentUser;
 
         public int SelectedId
         {
@@ -342,6 +345,8 @@ namespace QWellApp.ViewModels
             StatusList = new List<string>() { UserStatusEnum.Active.ToString(), UserStatusEnum.Inactive.ToString() };
             LoadSupplierList(SearchWord);
             userRepository = new UserRepository();
+            activityLogRepository = new ActivityLogRepository();
+            currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
             LoadSearchResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAllUsersCommand);
             GetSupplierDetails = new RelayCommand(ExecuteGetUserDetailsCommand, CanExecuteGetUserDetailsCommand);
             UpdateSupplierCommand = new RelayCommand(ExecuteUpdateCommand, CanExecuteForAdminsCommand);
@@ -355,9 +360,20 @@ namespace QWellApp.ViewModels
 
         private void ExecuteDeleteCommand(object obj)
         {
+            var oldData = supplierRepository.GetByID(SelectedId);
             var deleteSuccess = supplierRepository.Remove(SelectedId);
             if (deleteSuccess)
             {
+                // Log the activity
+                var log = new ActivityLog
+                {
+                    AffectedEntity = EntitiesEnum.Suppliers,
+                    AffectedEntityId = SelectedId,
+                    ActionType = ActionTypeEnum.Delete,
+                    OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                    NewValues = "-"
+                };
+                activityLogRepository.AddLog(log, currentUser);
                 LoadSupplierList("");
             }
         }
@@ -408,6 +424,16 @@ namespace QWellApp.ViewModels
                 var createSuccess = supplierRepository.Add(createSupplier);
                 if (createSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Suppliers,
+                        AffectedEntityId = createSupplier.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(createSupplier)
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     SupplierListVisibility = true;
                     CreateGridVisibility = false;
@@ -477,9 +503,20 @@ namespace QWellApp.ViewModels
                     TelephoneNum = Telephone,
                     Status = (Status == "") ? UserStatusEnum.Active.ToString() : Status,
                 };
+                var oldData = supplierRepository.GetByID(updateSupplier.Id);
                 bool editSuccess = supplierRepository.Edit(updateSupplier);
                 if (editSuccess)
                 {
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.Suppliers,
+                        AffectedEntityId = updateSupplier.Id,
+                        ActionType = ActionTypeEnum.Update,
+                        OldValues = JsonConvert.SerializeObject(oldData), // Serialize the whole object
+                        NewValues = JsonConvert.SerializeObject(updateSupplier) // Serialize the whole object
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
                     UpdateGridVisibility = false;
                     SupplierListVisibility = true;
                     CreateGridVisibility = false;

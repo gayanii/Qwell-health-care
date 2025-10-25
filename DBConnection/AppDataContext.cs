@@ -36,6 +36,8 @@ namespace QWellApp.DBConnection
         //public DbSet<Commission> Commissions { get; set; }
         public DbSet<ProcedureRecord> ProcedureRecords { get; set; }
         public DbSet<RecordType> Records { get; set; }
+        public DbSet<ChannelRecord> ChannelRecords { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,7 +45,8 @@ namespace QWellApp.DBConnection
             modelBuilder.Entity<RecordType>().HasData(
                 new RecordType { Id = 1, TypeName = "Medical" },
                 new RecordType { Id = 2, TypeName = "Lab" },
-                new RecordType { Id = 3, TypeName = "Procedure" }
+                new RecordType { Id = 3, TypeName = "Procedure" },
+                new RecordType { Id = 4, TypeName = "Channel" }
             );
 
             // Seed data for Roles
@@ -88,6 +91,11 @@ namespace QWellApp.DBConnection
                 entity.HasOne(e => e.LabRecord)
                     .WithMany()
                     .HasForeignKey(e => e.LabRecordId)
+                    .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
+
+                entity.HasOne(e => e.ChannelRecord)
+                    .WithMany()
+                    .HasForeignKey(e => e.ChannelRecordId)
                     .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
             });
         }

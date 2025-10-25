@@ -13,5 +13,6 @@ namespace QWellApp.Repositories
         Task<IEnumerable<Commission>> GetMedicalCommissions(DateTime startDate, DateTime endDate);
         Task<IEnumerable<Commission>> GetLabCommissions(DateTime startDate, DateTime endDate);
         Task<IEnumerable<Commission>> GetProcedureCommissions(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Commission>> GetChannelCommissions(DateTime startDate, DateTime endDate);
     }
 }

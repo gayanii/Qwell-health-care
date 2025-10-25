@@ -209,7 +209,7 @@
                     <TextBlock Grid.Row="0" Text="Gender *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="60 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="NIC *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="70 0 0 10" Text="{Binding NICErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="3" Margin="70 0 0 10" Text="" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Age *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="5" Margin="70 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="6" Text="AllergicHistory" Style="{StaticResource text}"/>
@@ -326,7 +326,7 @@
                     <TextBlock Grid.Row="0" Text="Gender *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="60 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="NIC *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="70 0 0 10" Text="{Binding NICErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="3" Margin="70 0 0 10" Text="" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Age *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="5" Margin="70 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="6" Text="AllergicHistory" Style="{StaticResource text}"/>

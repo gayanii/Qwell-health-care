@@ -20,13 +20,16 @@ namespace QWellApp.ViewModels
         private IEnumerable<MedicalSummary> _medicalSummaryList;
         private IEnumerable<ProcedureSummary> _procedureSummaryList;
         private IEnumerable<LabSummary> _labSummaryList;
+        private IEnumerable<ChannelSummary> _channelSummaryList;
         private Report _medicalReportSummary;
         private Report _procedureReportSummary;
         private Report _labReportSummary;
+        private Report _channelReportSummary;
         private Report _fullReportSummary;
         private string _noResultsMed;
         private string _noResultsPro;
         private string _noResultsLab;
+        private string _noResultsCha;
         private DateTime _startDate = DateTime.Today;
         private DateTime _endDate = DateTime.Today;
         private int _selectedId;
@@ -81,6 +84,18 @@ namespace QWellApp.ViewModels
                 OnPropertyChanged(nameof(LabSummaryList));
             }
         }
+        public IEnumerable<ChannelSummary> ChannelSummaryList
+        {
+            get
+            {
+                return _channelSummaryList;
+            }
+            set
+            {
+                _channelSummaryList = value;
+                OnPropertyChanged(nameof(ChannelSummaryList));
+            }
+        }
 
         public Report MedicalReportSummary
         {
@@ -116,6 +131,18 @@ namespace QWellApp.ViewModels
             {
                 _labReportSummary = value;
                 OnPropertyChanged(nameof(LabReportSummary));
+            }
+        }
+        public Report ChannelReportSummary
+        {
+            get
+            {
+                return _channelReportSummary;
+            }
+            set
+            {
+                _channelReportSummary = value;
+                OnPropertyChanged(nameof(ChannelReportSummary));
             }
         }
 
@@ -254,6 +281,12 @@ namespace QWellApp.ViewModels
             set { _noResultsPro = value; OnPropertyChanged(nameof(NoResultsPro)); }
         }
 
+        public string NoResultsCha
+        {
+            get => _noResultsCha;
+            set { _noResultsCha = value; OnPropertyChanged(nameof(NoResultsCha)); }
+        }
+
         // Commands
         public ICommand LoadReportResults { get; }
 
@@ -266,6 +299,7 @@ namespace QWellApp.ViewModels
             LoadMedicalSummaryList(StartDate, EndDate);
             LoadProcedureSummaryList(StartDate, EndDate);
             LoadLabSummaryList(StartDate, EndDate);
+            LoadChannelSummaryList(StartDate, EndDate);
             LoadReportResults = new RelayCommand(ExecuteSearchCommand, CanExecuteForAdminsCommand);
             ButtonVisibility();
         }
@@ -337,11 +371,27 @@ namespace QWellApp.ViewModels
             }
         }
 
+        private async void LoadChannelSummaryList(DateTime startDate, DateTime endDate)
+        {
+            IEnumerable<ChannelSummary> summaries = await summaryRepository.GetChannelSummary(StartDate, EndDate);
+            ChannelSummaryList = summaries;
+            Report report = await summaryRepository.GenerateReport(summaries, StartDate, EndDate);
+            ChannelReportSummary = report;
+            if (ChannelSummaryList.Any())
+            {
+                NoResultsCha = "Hidden";
+            }
+            else
+            {
+                NoResultsCha = "Visible";
+            }
+        }
+
         private void LoadAllSummaryList()
         {
-            if (MedicalReportSummary != null && ProcedureReportSummary != null && LabReportSummary != null)
+            if (MedicalReportSummary != null && ProcedureReportSummary != null && LabReportSummary != null && ChannelReportSummary != null)
             {
-                Report report = summaryRepository.GenerateFullReport(MedicalReportSummary, ProcedureReportSummary, LabReportSummary);
+                Report report = summaryRepository.GenerateFullReport(MedicalReportSummary, ProcedureReportSummary, LabReportSummary, ChannelReportSummary);
                 FullReportSummary = report;
             }
         }
@@ -351,6 +401,7 @@ namespace QWellApp.ViewModels
             LoadMedicalSummaryList(StartDate, EndDate);
             LoadProcedureSummaryList(StartDate, EndDate);
             LoadLabSummaryList(StartDate, EndDate);
+            LoadChannelSummaryList(StartDate, EndDate);
             LoadAllSummaryList();
         }
 

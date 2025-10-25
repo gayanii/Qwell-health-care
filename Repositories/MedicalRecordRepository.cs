@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using QWellApp.DBConnection;
 using QWellApp.Enums;
 using QWellApp.Helpers;
@@ -20,6 +21,7 @@ namespace QWellApp.Repositories
         public IUserRepository userRepository;
         public IProductRepository productRepository;
         public IProductMedicalRecordRepository productMedicalRepository;
+        public IActivityLogRepository activityLogRepository;
         public Validation validator;
 
         public MedicalRecordRepository()
@@ -27,6 +29,7 @@ namespace QWellApp.Repositories
             userRepository = new UserRepository();
             productRepository = new ProductRepository();
             productMedicalRepository = new ProductMedicalRecordRepository();
+            activityLogRepository = new ActivityLogRepository();
             validator = new Validation();
         }
 
@@ -95,6 +98,29 @@ namespace QWellApp.Repositories
                     }
                     context.SaveChanges(); // Save changes after adding all doses
                     MessageBox.Show("Medical Record created Successfully!");
+
+                    var newMedicine = productMedicalRepository.GetAll(newMedicalRecord.Id, RecordTypeEnum.Medical);
+                    var currentUser = userRepository.GetByUsername(Properties.Settings.Default.Username);
+                    // Transform newMedicine list to remove unwanted properties
+                    var filteredNewMedicineData = newMedicine.Select(m => new
+                    {
+                        m.Id,
+                        m.ProductId,
+                        m.Units,
+                        m.SoldPrice
+                    }).ToList();
+
+                    // Log the activity
+                    var log = new ActivityLog
+                    {
+                        AffectedEntity = EntitiesEnum.MedicalRecords,
+                        AffectedEntityId = medicalRecordModel.Id,
+                        ActionType = ActionTypeEnum.Add,
+                        OldValues = "-",
+                        NewValues = JsonConvert.SerializeObject(medicalRecordModel) + "\n\nMedicine:\n" + JsonConvert.SerializeObject(filteredNewMedicineData),
+                    };
+                    activityLogRepository.AddLog(log, currentUser);
+
                     return true;
                 }
             }
