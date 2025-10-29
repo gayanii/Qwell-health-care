@@ -57,8 +57,17 @@
         <DataTemplate DataType="{x:Type viewModel:CommissionViewModel}">
             <uc:CommissionView/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModel:SummaryViewModel}">
-            <uc:SummaryView/>
+        <DataTemplate DataType="{x:Type viewModel:MedicalSummaryViewModel}">
+            <uc:MedicalSummaryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:ProcedureSummaryViewModel}">
+            <uc:ProcedureSummaryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:LabSummaryViewModel}">
+            <uc:LabSummaryView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModel:ChanellingSummaryViewModel}">
+            <uc:ChanellingSummaryView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModel:ChangePasswordViewModel}">
             <uc:ChangePasswordView/>
@@ -232,7 +241,7 @@
                             </StackPanel>
                         </RadioButton>
 
-                        <!--Commission-->
+                        <!--Commissions-->
                         <Expander IsExpanded="False"
                                   Margin="5"
                                   Foreground="{StaticResource color1}"
@@ -314,15 +323,104 @@
                             </StackPanel>
                         </Expander>
 
+                        <!--Reports-->
+                        <Expander IsExpanded="False"
+                            Margin="5"
+                            Foreground="{StaticResource color3}"
+                            FontFamily="Montserrat"
+                            FontWeight="Medium"
+                            FontSize="15"
+                            VerticalAlignment="Center">
+                            <Expander.Template>
+                                <ControlTemplate TargetType="Expander">
+                                    <Border BorderThickness="0" Background="Transparent">
+                                        <Grid>
+                                            <!-- Two rows: Header and Content -->
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Header Section -->
+                                            <Grid Grid.Row="0">
+                                                <!-- Two columns: Header Content and Toggle Button -->
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="150" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Header Content -->
+                                                <ContentPresenter Grid.Column="0"
+                                                    ContentSource="Header"
+                                                    Margin="5"
+                                                    VerticalAlignment="Center" />
+
+                                                <!-- Toggle Button -->
+                                                <ToggleButton Grid.Column="1"
+                                                    IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Style="{StaticResource DropdownToggleButtonStyle}"/>
+                                            </Grid>
+
+                                            <!-- Content Section -->
+                                            <ContentPresenter Grid.Row="1"
+                                                ContentSource="Content"
+                                                Margin="10,0,0,0"
+                                                Visibility="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibility}}" />
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Expander.Template>
+
+                            <!-- Expander Header Content -->
+                            <Expander.Header>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <fa:IconImage Icon="ClipboardList" Style="{StaticResource menuButtonIcon}" Margin="0,0,10,0" Foreground="{StaticResource color3}" />
+                                    <TextBlock Text="Reports" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Expander.Header>
+
+                            <!-- Expander Content -->
+                            <StackPanel Margin="30,0,0,0">
+                                <RadioButton Style="{StaticResource menuButton}"
+                                     Tag="{StaticResource color3}"
+                                     Command="{Binding ShowMedicalReportViewCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text=" - Medical Reports" Style="{StaticResource menuButtonText}" />
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton Style="{StaticResource menuButton}"
+                                     Tag="{StaticResource color3}"
+                                     Command="{Binding ShowProcedureReportViewCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text=" - Procedure Reports" Style="{StaticResource menuButtonText}" />
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton Style="{StaticResource menuButton}"
+                                     Tag="{StaticResource color3}"
+                                     Command="{Binding ShowLabReportViewCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text=" - Lab Reports" Style="{StaticResource menuButtonText}" />
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton Style="{StaticResource menuButton}"
+                                     Tag="{StaticResource color3}"
+                                     Command="{Binding ShowChanellingReportViewCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text=" - Chanelling Reports" Style="{StaticResource menuButtonText}" />
+                                    </StackPanel>
+                                </RadioButton>
+                            </StackPanel>
+                        </Expander>
+
                         <!--Summary-->
-                        <RadioButton Style="{StaticResource menuButton}"
+                        <!--<RadioButton Style="{StaticResource menuButton}"
                          Tag="{StaticResource color3}"
                          Command="{Binding ShowSummaryViewCommand}">
                             <StackPanel Orientation="Horizontal">
                                 <fa:IconImage Icon="ClipboardList" Style="{StaticResource menuButtonIcon}" />
                                 <TextBlock Text="Summary" Style="{StaticResource menuButtonText}" />
                             </StackPanel>
-                        </RadioButton>
+                        </RadioButton>-->
 
                         <!--Activity Logs-->
                         <RadioButton Style="{StaticResource menuButton}"

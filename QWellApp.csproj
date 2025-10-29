@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Views\UserControls\ProcedureSummaryView.xaml~RF22b55fa3.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Assets\Images\" />
     <Folder Include="Controllers\" />
     <Folder Include="Migrations\" />
@@ -47,6 +51,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\UserControls\ActivityLogsView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\UserControls\ChanellingSummaryView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\UserControls\ProcedureSummaryView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

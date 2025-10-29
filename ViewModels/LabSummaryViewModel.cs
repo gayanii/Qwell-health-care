@@ -14,7 +14,7 @@ using System.Windows.Input;
 
 namespace QWellApp.ViewModels
 {
-    public class SummaryViewModel : ViewModelBase
+    public class LabSummaryViewModel : ViewModelBase, SummaryViewModel
     {
         // Fields
         private IEnumerable<MedicalSummary> _medicalSummaryList;
@@ -291,7 +291,7 @@ namespace QWellApp.ViewModels
         public ICommand LoadReportResults { get; }
 
         // Constructor
-        public SummaryViewModel()
+        public LabSummaryViewModel()
         {
             summaryRepository = new SummaryRepository();
             MedicalSummaryList = new List<MedicalSummary>();

@@ -107,7 +107,10 @@ namespace QWellApp.ViewModels
         public ICommand ShowMedicalCommissionViewCommand { get; }
         public ICommand ShowLabCommissionViewCommand { get; }
         public ICommand ShowProcedureCommissionViewCommand { get; }
-        public ICommand ShowSummaryViewCommand { get; }
+        public ICommand ShowMedicalReportViewCommand { get; }
+        public ICommand ShowProcedureReportViewCommand { get; }
+        public ICommand ShowLabReportViewCommand { get; }
+        public ICommand ShowChanellingReportViewCommand { get; }
         public ICommand ShowActivityLogsViewCommand { get; }
         public ICommand LogoutCommand { get; }
         public ICommand ShowChangePasswordViewCommand { get; }
@@ -132,7 +135,10 @@ namespace QWellApp.ViewModels
             ShowMedicalCommissionViewCommand = new RelayCommand(ExecuteShowMedicalCommissionViewCommand);
             ShowLabCommissionViewCommand = new RelayCommand(ExecuteShowLabCommissionViewCommand);
             ShowProcedureCommissionViewCommand = new RelayCommand(ExecuteShowProcedureCommissionViewCommand);
-            ShowSummaryViewCommand = new RelayCommand(ExecuteShowSummaryViewCommand);
+            ShowMedicalReportViewCommand = new RelayCommand(ExecuteShowMedicalReportViewCommand);
+            ShowProcedureReportViewCommand = new RelayCommand(ExecuteShowProcedureReportViewCommand);
+            ShowLabReportViewCommand = new RelayCommand(ExecuteShowLabReportViewCommand);
+            ShowChanellingReportViewCommand = new RelayCommand(ExecuteShowChanellingReportViewCommand);
             ShowActivityLogsViewCommand = new RelayCommand(ExecuteShowActivityLogsViewCommand);
             LogoutCommand = new RelayCommand(ExecuteLogoutCommand);
             ShowChangePasswordViewCommand = new RelayCommand(ExecuteShowChangePasswordViewCommand);
@@ -269,10 +275,34 @@ namespace QWellApp.ViewModels
             Application.Current.Properties["PageName"] = Caption;
         }
 
-        private void ExecuteShowSummaryViewCommand(object obj)
+        private void ExecuteShowMedicalReportViewCommand(object obj)
         {
-            CurrentChildView = new SummaryViewModel();
-            Caption = "Summary";
+            CurrentChildView = new MedicalSummaryViewModel();
+            Caption = "Medical Reports";
+            Icon = IconChar.ClipboardList;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
+        private void ExecuteShowProcedureReportViewCommand(object obj)
+        {
+            CurrentChildView = new ProcedureSummaryViewModel();
+            Caption = "Procedure Reports";
+            Icon = IconChar.ClipboardList;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
+        private void ExecuteShowLabReportViewCommand(object obj)
+        {
+            CurrentChildView = new LabSummaryViewModel();
+            Caption = "Lab Reports";
+            Icon = IconChar.ClipboardList;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
+        private void ExecuteShowChanellingReportViewCommand(object obj)
+        {
+            CurrentChildView = new ChanellingSummaryViewModel();
+            Caption = "Chanelling Reports";
             Icon = IconChar.ClipboardList;
             Application.Current.Properties["PageName"] = Caption;
         }
