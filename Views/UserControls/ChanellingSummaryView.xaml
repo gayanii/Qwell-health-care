@@ -26,6 +26,7 @@
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
@@ -107,6 +108,9 @@
             </Border>
             <Grid Grid.Row="2">
                 <TextBlock x:Name="NoResultCha" Margin="100" HorizontalAlignment="Center" Text="No Results Found!" Visibility="{Binding NoResultsCha}"/>
+            </Grid>
+            <Grid Grid.Row="3">
+                <TextBlock x:Name="TotalBillTxt" Margin="20 0" FontSize="18" VerticalAlignment="Bottom" FontWeight="Black" HorizontalAlignment="Right" Text="{Binding SumOfTotalCha}" />
             </Grid>
         </Grid>
     </Grid>
