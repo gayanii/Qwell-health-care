@@ -27,9 +27,7 @@ namespace QWellApp.ViewModels
         private Report _channelReportSummary;
         private Report _fullReportSummary;
         private string _noResultsMed;
-        private string _noResultsPro;
-        private string _noResultsLab;
-        private string _noResultsCha;
+        private string _sumOfTotalMed;
         private DateTime _startDate = DateTime.Today;
         private DateTime _endDate = DateTime.Today;
         private int _selectedId;
@@ -188,22 +186,10 @@ namespace QWellApp.ViewModels
             set { _noResultsMed = value; OnPropertyChanged(nameof(NoResultsMed)); }
         }
 
-        public string NoResultsLab
+        public string SumOfTotalMed
         {
-            get => _noResultsLab;
-            set { _noResultsLab = value; OnPropertyChanged(nameof(NoResultsLab)); }
-        }
-
-        public string NoResultsPro
-        {
-            get => _noResultsPro;
-            set { _noResultsPro = value; OnPropertyChanged(nameof(NoResultsPro)); }
-        }
-
-        public string NoResultsCha
-        {
-            get => _noResultsCha;
-            set { _noResultsCha = value; OnPropertyChanged(nameof(NoResultsCha)); }
+            get => _sumOfTotalMed;
+            set { _sumOfTotalMed = value; OnPropertyChanged(nameof(SumOfTotalMed)); }
         }
 
         public DateTime StartDate
@@ -342,6 +328,7 @@ namespace QWellApp.ViewModels
             if (MedicalSummaryList.Any())
             {
                 NoResultsMed = "Hidden";
+                SumOfTotalMed = $"Total: {MedicalReportSummary.TotalIncome ?? 0:F2}";
             }
             else
             {
@@ -355,14 +342,6 @@ namespace QWellApp.ViewModels
             ProcedureSummaryList = summaries;
             Report report = await summaryRepository.GenerateReport(summaries, StartDate, EndDate);
             ProcedureReportSummary = report;
-            if (ProcedureSummaryList.Any())
-            {
-                NoResultsPro = "Hidden";
-            }
-            else
-            {
-                NoResultsPro = "Visible";
-            }
         }
 
         private async void LoadLabSummaryList(DateTime startDate, DateTime endDate)
@@ -371,14 +350,6 @@ namespace QWellApp.ViewModels
             LabSummaryList = summaries;
             Report report = await summaryRepository.GenerateReport(summaries, StartDate, EndDate);
             LabReportSummary = report;
-            if (LabSummaryList.Any())
-            {
-                NoResultsLab = "Hidden";
-            }
-            else
-            {
-                NoResultsLab = "Visible";
-            }
         }
 
         private async void LoadChannelSummaryList(DateTime startDate, DateTime endDate)
@@ -387,14 +358,6 @@ namespace QWellApp.ViewModels
             ChannelSummaryList = summaries;
             Report report = await summaryRepository.GenerateReport(summaries, StartDate, EndDate);
             ChannelReportSummary = report;
-            if (ChannelSummaryList.Any())
-            {
-                NoResultsCha = "Hidden";
-            }
-            else
-            {
-                NoResultsCha = "Visible";
-            }
         }
 
         private void LoadAllSummaryList()

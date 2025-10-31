@@ -118,10 +118,10 @@ namespace QWellApp.Helpers
                         $"Full Report - (From {summaryViewModel.StartDate:dd-MM-yyyy} 7.00AM to {summaryViewModel.EndDate.AddDays(1):dd-MM-yyyy} 6.59AM)"
                     );
 
-                    AddSummarySection(document, "Summary of the medical records", summaryViewModel.MedicalSummaryList, MedicalSummaryHeaders, extractMedicalRowData);
-                    AddSummarySection(document, "Summary of the procedure records", summaryViewModel.ProcedureSummaryList, ProcedureSummaryHeaders, extractProcedureRowData);
-                    AddSummarySection(document, "Summary of the lab records", summaryViewModel.LabSummaryList, LabSummaryHeaders, extractLabRowData);
-                    AddSummarySection(document, "Summary of the channelling records", summaryViewModel.ChannelSummaryList, ChannelSummaryHeaders, extractChannelRowData);
+                    AddSummarySection(document, "Summary of the medical records", summaryViewModel.MedicalSummaryList, MedicalSummaryHeaders, extractMedicalRowData, r => (float)r.TotalBill);
+                    AddSummarySection(document, "Summary of the procedure records", summaryViewModel.ProcedureSummaryList, ProcedureSummaryHeaders, extractProcedureRowData, r => (float)r.TotalBill);
+                    AddSummarySection(document, "Summary of the lab records", summaryViewModel.LabSummaryList, LabSummaryHeaders, extractLabRowData, r => (float)r.TotalBill);
+                    AddSummarySection(document, "Summary of the channelling records", summaryViewModel.ChannelSummaryList, ChannelSummaryHeaders, extractChannelRowData, r => (float)r.TotalBill);
 
                     // Total summary
                     var total = summaryViewModel.MedicalSummaryList.Count()
@@ -159,7 +159,8 @@ namespace QWellApp.Helpers
             string title,
             IEnumerable<T> list,
             List<string> headers,
-            Func<T, List<string>> extractRowData)
+            Func<T, List<string>> extractRowData,
+            Func<T, float>? extractTotal = null)
         {
             document.Add(new Paragraph(title)
                 .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
@@ -186,6 +187,17 @@ namespace QWellApp.Helpers
             }
 
             document.Add(table.SetMarginBottom(10));
+
+            if (extractTotal != null)
+            {
+                var total = list.Sum(extractTotal);
+                var totalText = new Paragraph($"Total: {Math.Round(total, 2):N2}")
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT)
+                    .SetMarginTop(10)
+                    .SetMarginBottom(10);
+
+                document.Add(totalText);
+            }
         }
 
         private static Table CreateSummaryTable(Report reportData)
@@ -196,10 +208,10 @@ namespace QWellApp.Helpers
             table.AddHeaderCell(new Cell().Add(new Paragraph("Total Commissions").SetBold()));
             table.AddHeaderCell(new Cell().Add(new Paragraph("Balance (Total Income - Total Lab Paid - Total Commissions)").SetBold()));
 
-            table.AddCell(reportData.TotalIncome.ToString());
-            table.AddCell(reportData.TotalLabPaid.ToString());
-            table.AddCell(reportData.TotalCommissions.ToString());
-            table.AddCell(reportData.Balance.ToString());
+            table.AddCell($"{Math.Round(reportData.TotalIncome ?? 0, 2):N2}");
+            table.AddCell($"{Math.Round(reportData.TotalLabPaid ?? 0, 2):N2}");
+            table.AddCell($"{Math.Round(reportData.TotalCommissions ?? 0, 2):N2}");
+            table.AddCell($"{Math.Round(reportData.Balance ?? 0, 2):N2}");
 
             return table;
         }
@@ -245,6 +257,13 @@ namespace QWellApp.Helpers
                 // Table 1 (Detailed Data)
                 var table1 = Table1(tableHeaders, summaryList, extractRowData, new Table(tableHeaders.Count));
                 document.Add(table1.SetMarginBottom(10));
+
+                var totalText = new Paragraph($"Total: {Math.Round(reportSummary.TotalIncome ?? 0, 2):N2}")
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT)
+                    .SetMarginTop(10)
+                    .SetMarginBottom(10);
+
+                document.Add(totalText);
 
                 var spacerText = new Paragraph("Total Summary")
                     .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
