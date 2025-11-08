@@ -35,6 +35,9 @@ namespace QWellApp.Views.UserControls
         private ISummaryRepository summaryRepository;
         private ViewModelBase CurrentChildView;
         private MedicalSummaryViewModel summaryViewModel;
+        private readonly Helpers.Validation validator = new Helpers.Validation();
+        private int _previousEndValue;
+        private int _previousStartValue;
 
         private readonly List<string> medicalSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "OPD Charge", "Pharmacy Bill", "Consultation Fee", "Other Charges", "Total Commissions", "Total Bill" };
         
@@ -55,7 +58,10 @@ namespace QWellApp.Views.UserControls
         {
             InitializeComponent();
             summaryViewModel = new MedicalSummaryViewModel();
+            validator = new Helpers.Validation();
             DataContext = summaryViewModel;
+            _previousStartValue = summaryViewModel.StartTime;
+            _previousEndValue = summaryViewModel.EndTime;
             summaryRepository = new SummaryRepository();
         }
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -79,5 +85,56 @@ namespace QWellApp.Views.UserControls
             PdfExportHelper.ExportFullReport(summaryViewModel);
         }
 
+        private void StartTimeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(DataContext is MedicalSummaryViewModel vm)) return;
+
+            if (StartTime.SelectedValue is int newValue)
+            {
+                var currentVmValue = vm.StartTime;
+
+                vm.StartTime = newValue;
+
+                if (!IsVmDateRangeValid(vm))
+                {
+                    vm.StartTime = _previousStartValue;
+
+                    StartTime.SelectedValue = _previousStartValue;
+                }
+                else
+                {
+                    _previousStartValue = newValue;
+                }
+            }
+        }
+
+        private void EndTimeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(DataContext is MedicalSummaryViewModel vm)) return;
+            if (EndTime.SelectedValue is int newValue)
+            {
+                var currentVmValue = vm.EndTime;
+
+                vm.EndTime = newValue;
+
+                if (!IsVmDateRangeValid(vm))
+                {
+                    vm.EndTime = _previousEndValue;
+
+                    EndTime.SelectedValue = _previousEndValue;
+                }
+                else
+                {
+                    _previousEndValue = newValue;
+                }
+            }
+        }
+
+        private bool IsVmDateRangeValid(MedicalSummaryViewModel vm)
+        {
+            var start = validator.CalculateStartDateTime(vm.StartDate, vm.StartTime);
+            var end = validator.CalculateEndDateTime(vm.EndDate, vm.EndTime);
+            return start <= end;
+        }
     }
 }

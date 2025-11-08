@@ -493,4 +493,9 @@
         <Setter Property="Background" Value="{StaticResource color2}"/>
     </Style>
 
+    <!-- Style for the Fourth DataGrid Headers -->
+    <Style x:Key="DataGridHeaderStyle4" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource CommonHeaderStyle}">
+        <Setter Property="Background" Value="{StaticResource color3}"/>
+    </Style>
+
 </ResourceDictionary>

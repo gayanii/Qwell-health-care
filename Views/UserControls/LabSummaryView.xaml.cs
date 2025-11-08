@@ -22,6 +22,7 @@ using Microsoft.Win32;
 using iText.Layout.Element;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using QWellApp.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace QWellApp.Views.UserControls
 {
@@ -35,6 +36,9 @@ namespace QWellApp.Views.UserControls
         private ISummaryRepository summaryRepository;
         private ViewModelBase CurrentChildView;
         private LabSummaryViewModel summaryViewModel;
+        private readonly Helpers.Validation validator = new Helpers.Validation();
+        private int _previousEndValue;
+        private int _previousStartValue;
 
         private readonly List<string> labSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "Lab Bill", "Lab Paid Cost", "Consultation Fee", "Consumable Charges", "Total Commissions", "Total Bill"};
         
@@ -77,6 +81,58 @@ namespace QWellApp.Views.UserControls
         private void DownloadFullReportButton_Click(object sender, RoutedEventArgs e)
         {
             PdfExportHelper.ExportFullReport(summaryViewModel);
+        }
+
+        private void StartTimeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(DataContext is LabSummaryViewModel vm)) return;
+
+            if (StartTime.SelectedValue is int newValue)
+            {
+                var currentVmValue = vm.StartTime;
+
+                vm.StartTime = newValue;
+
+                if (!IsVmDateRangeValid(vm))
+                {
+                    vm.StartTime = _previousStartValue;
+
+                    StartTime.SelectedValue = _previousStartValue;
+                }
+                else
+                {
+                    _previousStartValue = newValue;
+                }
+            }
+        }
+
+        private void EndTimeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(DataContext is LabSummaryViewModel vm)) return;
+            if (EndTime.SelectedValue is int newValue)
+            {
+                var currentVmValue = vm.EndTime;
+
+                vm.EndTime = newValue;
+
+                if (!IsVmDateRangeValid(vm))
+                {
+                    vm.EndTime = _previousEndValue;
+
+                    EndTime.SelectedValue = _previousEndValue;
+                }
+                else
+                {
+                    _previousEndValue = newValue;
+                }
+            }
+        }
+
+        private bool IsVmDateRangeValid(LabSummaryViewModel vm)
+        {
+            var start = validator.CalculateStartDateTime(vm.StartDate, vm.StartTime);
+            var end = validator.CalculateEndDateTime(vm.EndDate, vm.EndTime);
+            return start <= end;
         }
     }
 }

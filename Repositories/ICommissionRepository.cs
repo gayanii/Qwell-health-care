@@ -10,9 +10,9 @@ namespace QWellApp.Repositories
     public interface ICommissionRepository
     {
         //bool Add(List<Commission> commissions);
-        Task<IEnumerable<Commission>> GetMedicalCommissions(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<Commission>> GetLabCommissions(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<Commission>> GetProcedureCommissions(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<Commission>> GetChannelCommissions(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Commission>> GetMedicalCommissions(DateTime startDateTime, DateTime endDateTime);
+        Task<IEnumerable<Commission>> GetLabCommissions(DateTime startDateTime, DateTime endDateTime);
+        Task<IEnumerable<Commission>> GetProcedureCommissions(DateTime startDateTime, DateTime endDateTime);
+        Task<IEnumerable<Commission>> GetChannelCommissions(DateTime startDateTime, DateTime endDateTime);
     }
 }

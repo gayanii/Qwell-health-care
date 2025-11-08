@@ -572,6 +572,10 @@ namespace QWellApp.ViewModels
                 ReceivedDateErrorMessage = (string.IsNullOrWhiteSpace(ReceivedDate.ToString())) ? "Received date is required." : "";
                 SupplierNameErrorMessage = (string.IsNullOrWhiteSpace(Supplier)) ? "Supplier name is required." : "";
             }
+            else if (ExpDate <= ReceivedDate)
+            {
+                MessageBox.Show("Exp date should be greater than the received date");
+            }
             else
             {
                 if (!Application.Current.Properties.Contains("Username"))
@@ -670,6 +674,10 @@ namespace QWellApp.ViewModels
                 AddedByNameErrorMessage = (string.IsNullOrWhiteSpace(AddedBy)) ? "Added by name is required." : "";
                 ReceivedDateErrorMessage = (string.IsNullOrWhiteSpace(ReceivedDate.ToString())) ? "Received date is required." : "";
                 SupplierNameErrorMessage = (string.IsNullOrWhiteSpace(Supplier)) ? "Supplier name is required." : "";
+            }
+            else if (ExpDate <= ReceivedDate)
+            {
+                MessageBox.Show("Exp date should be greater than the received date");
             }
             else
             {

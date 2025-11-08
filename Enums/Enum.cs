@@ -24,6 +24,18 @@ namespace QWellApp.Enums
         Inactive
     }
 
+    public enum TimeframeListEnum
+    {
+        [Description("7am to 5pm")]
+        FirstPhase = 1,
+
+        [Description("5.01pm to 10pm")]
+        SecondPhase = 2,
+
+        [Description("10.01pm to 6.59am")]
+        ThirdPhase = 3
+    }
+
     public enum EmployeeTypeEnum
     {
         [Description("Admin")]

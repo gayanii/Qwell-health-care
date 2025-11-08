@@ -11,6 +11,11 @@
                 <ResourceDictionary Source="/Styles/ButtonStyles.xaml" />
                 <ResourceDictionary Source="/Styles/TextStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="DatePickerTextBox">
+                <Setter Property="IsReadOnly" Value="True"/>
+                <Setter Property="Cursor" Value="Arrow"/>
+            </Style>
         </ResourceDictionary>
         
     </Application.Resources>

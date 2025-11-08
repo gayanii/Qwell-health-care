@@ -32,25 +32,28 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="80"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="200"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 0 0 0" Text="Start Date: " Style="{StaticResource text}"/>
-                <DatePicker Name="CommissionStartDate" Grid.Column="1" Width="150"  Grid.Row="0" Foreground="Black" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
-                <TextBlock Grid.Column="2" Grid.Row="0" Margin="0 0 0 0" Text="End Date: " Style="{StaticResource text}"/>
-                <DatePicker Name="CommissionEndDate" Grid.Column="3" Width="150"  Grid.Row="0" Foreground="Black" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
-                <Button Grid.Column="6" Grid.Row="0"
-                        Style="{StaticResource commandButton}"
-                        Content="Generate Report"
-                        Tag="{StaticResource color2}"
-                        Command="{Binding LoadReportResults}">
+                <DatePicker Name="StartDate" Grid.Column="1" Width="150"  Grid.Row="0" Foreground="Black" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
+                <ComboBox x:Name="StartTime" Grid.Column="2" Grid.Row="10" ItemsSource="{Binding TimeframeList}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectionChanged="StartTimeCombo_SelectionChanged" SelectedValue="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,30,0" Width="140" VerticalAlignment="Center" Foreground="#868686" />
+                <TextBlock Grid.Column="3" Grid.Row="0" Margin="0 0 0 0" Text="End Date: " Style="{StaticResource text}"/>
+                <DatePicker Name="EndDate" Grid.Column="4" Width="150"  Grid.Row="0" Foreground="Black" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource datePickerStyle}"/>
+                <ComboBox x:Name="EndTime" Grid.Column="5" Grid.Row="10" ItemsSource="{Binding TimeframeList}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectionChanged="EndTimeCombo_SelectionChanged" SelectedValue="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,0" Width="140" VerticalAlignment="Center" Foreground="#868686" />
+                <!--<Button Grid.Column="6" Grid.Row="0"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource commandButton}"
+                    Content="Generate Report"
+                    Tag="{StaticResource color2}"
+                    Command="{Binding LoadReportResults}">
                     <Button.Visibility>
                         <Binding Path="GenerateReportButtonVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
                     </Button.Visibility>
-                </Button>
+                </Button>-->
             </Grid>
             <Button 
                 Grid.Row="1" 
@@ -67,7 +70,7 @@
             <Button Grid.Row="1" 
                     Width="210"
                     HorizontalAlignment="Left"
-                    Margin="250,0,0,0"
+                    Margin="220,0,0,0"
                     Content="Download Lab Summary" 
                     Style="{StaticResource commandButton}"
                     Click="DownloadLabReportButton_Click" 

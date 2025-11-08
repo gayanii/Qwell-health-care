@@ -14,15 +14,12 @@ namespace QWellApp.Repositories
 {
     public class CommissionRepository : BaseRepository, ICommissionRepository
     {
-        public async Task<IEnumerable<Commission>> GetMedicalCommissions(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Commission>> GetMedicalCommissions(DateTime startDateTime, DateTime endDateTime)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
-                    // Calculate the start and end dates based on the summary date
-                    DateTime ComStartDate = startDate.AddHours(7);  // 10/20/2024 7:00:00 AM
-                    DateTime ComEndDate = endDate.AddDays(1).AddHours(6).AddMinutes(59); // 10/21/2024 6:59:00 AM
 
                     List<MedicalRecord> medicalRecords = context.MedicalRecords
                         .Include(x => x.Doctor)
@@ -31,7 +28,7 @@ namespace QWellApp.Repositories
                         .Include(x => x.Nurse1!.Role)
                         .Include(x => x.Nurse2)
                         .Include(x => x.Nurse2!.Role)
-                        .Where(x => x.AdmitDate >= ComStartDate && x.AdmitDate < ComEndDate)
+                        .Where(x => x.AdmitDate >= startDateTime && x.AdmitDate < endDateTime)
                         .OrderByDescending(p => p.AdmitDate) // Sort by AdmitDate in descending order. recent up
                         .ToList();
                     List<Commission> CommissionList = new List<Commission>();
@@ -55,16 +52,12 @@ namespace QWellApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<Commission>> GetLabCommissions(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Commission>> GetLabCommissions(DateTime startDateTime, DateTime endDateTime)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
-                    // Calculate the start and end dates based on the summary date
-                    DateTime ComStartDate = startDate.AddHours(7);  // 10/20/2024 7:00:00 AM
-                    DateTime ComEndDate = endDate.AddDays(1).AddHours(6).AddMinutes(59); // 10/21/2024 6:59:00 AM
-
                     List<LabRecord> labRecords = context.LabRecords
                         .Include(x => x.Doctor)
                         .Include(x => x.Doctor!.Role)
@@ -72,7 +65,7 @@ namespace QWellApp.Repositories
                         .Include(x => x.Nurse1!.Role)
                         .Include(x => x.Nurse2)
                         .Include(x => x.Nurse2!.Role)
-                        .Where(x => x.AdmitDate >= ComStartDate && x.AdmitDate < ComEndDate)
+                        .Where(x => x.AdmitDate >= startDateTime && x.AdmitDate < endDateTime)
                         .OrderByDescending(p => p.AdmitDate) // Sort by AdmitDate in descending order. recent up
                         .ToList();
                     List<Commission> CommissionList = new List<Commission>();
@@ -96,16 +89,12 @@ namespace QWellApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<Commission>> GetProcedureCommissions(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Commission>> GetProcedureCommissions(DateTime startDateTime, DateTime endDateTime)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
-                    // Calculate the start and end dates based on the summary date
-                    DateTime ComStartDate = startDate.AddHours(7);  // 10/20/2024 7:00:00 AM
-                    DateTime ComEndDate = endDate.AddDays(1).AddHours(6).AddMinutes(59); // 10/21/2024 6:59:00 AM
-
                     List<ProcedureRecord> procedureRecords = context.ProcedureRecords
                         .Include(x => x.Doctor)
                         .Include(x => x.Doctor.Role)
@@ -113,7 +102,7 @@ namespace QWellApp.Repositories
                         .Include(x => x.Nurse1!.Role)
                         .Include(x => x.Nurse2)
                         .Include(x => x.Nurse2!.Role)
-                        .Where(x => x.AdmitDate >= ComStartDate && x.AdmitDate < ComEndDate)
+                        .Where(x => x.AdmitDate >= startDateTime && x.AdmitDate < endDateTime)
                         .OrderByDescending(p => p.AdmitDate) // Sort by AdmitDate in descending order. recent up
                         .ToList();
                     List<Commission> CommissionList = new List<Commission>();
@@ -137,16 +126,12 @@ namespace QWellApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<Commission>> GetChannelCommissions(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Commission>> GetChannelCommissions(DateTime startDateTime, DateTime endDateTime)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
-                    // Calculate the start and end dates based on the summary date
-                    DateTime ComStartDate = startDate.AddHours(7);  // 10/20/2024 7:00:00 AM
-                    DateTime ComEndDate = endDate.AddDays(1).AddHours(6).AddMinutes(59); // 10/21/2024 6:59:00 AM
-
                     List<ChannelRecord> channelRecords = context.ChannelRecords
                         .Include(x => x.Doctor)
                         .Include(x => x.Doctor.Role)
@@ -154,7 +139,7 @@ namespace QWellApp.Repositories
                         .Include(x => x.Nurse1!.Role)
                         .Include(x => x.Nurse2)
                         .Include(x => x.Nurse2!.Role)
-                        .Where(x => x.AdmitDate >= ComStartDate && x.AdmitDate < ComEndDate)
+                        .Where(x => x.AdmitDate >= startDateTime && x.AdmitDate < endDateTime)
                         .OrderByDescending(p => p.AdmitDate) // Sort by AdmitDate in descending order. recent up
                         .ToList();
                     List<Commission> CommissionList = new List<Commission>();
