@@ -1,6 +1,8 @@
-﻿using iText.StyledXmlParser.Node;
+﻿using iText.Kernel.Pdf.Canvas.Parser.ClipperLib;
+using iText.StyledXmlParser.Node;
 using Microsoft.EntityFrameworkCore;
 using QWellApp.DBConnection;
+using QWellApp.Enums;
 using QWellApp.Models;
 using System;
 using System.Collections.Generic;
@@ -29,7 +31,7 @@ namespace QWellApp.Repositories
         }
 
         public async Task<IEnumerable<TSummary>> GetSummaryAsync<TRecord, TSummary>(
-            DateTime startDate, DateTime endDate,
+            DateTime SumStartDate, DateTime SumEndDate, 
             Func<TRecord, TSummary> createSummary,
             IQueryable<TRecord> recordQuery)
             where TRecord : class, IAdmitDateRecord  // Add constraint
@@ -39,10 +41,6 @@ namespace QWellApp.Repositories
             {
                 using (AppDataContext context = new AppDataContext())
                 {
-                    // Calculate the start and end dates
-                    DateTime SumStartDate = startDate.AddHours(7); // 7:00 AM
-                    DateTime SumEndDate = endDate.AddDays(1).AddHours(6).AddMinutes(59); // 6:59 AM next day
-
                     // Filter records based on admit date
                     var records = await recordQuery
                         .Where(x => x.AdmitDate >= SumStartDate && x.AdmitDate < SumEndDate)
@@ -68,14 +66,14 @@ namespace QWellApp.Repositories
         }
 
         // Wrapper methods for each summary type
-        public async Task<IEnumerable<MedicalSummary>> GetMedicalSummary(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<MedicalSummary>> GetMedicalSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
                     return await GetSummaryAsync<MedicalRecord, MedicalSummary>(
-                startDate, endDate,
+                sumStartDate, sumEndDate,
                 record =>
                 {
                     float totCom = CalculateTotalCommissions(record.DoctorId, record.DocComm, record.Nurse1Id, record.Nurse1Comm, record.Nurse2Id, record.Nurse2Comm);
@@ -102,14 +100,14 @@ namespace QWellApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<ProcedureSummary>> GetProcedureSummary(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<ProcedureSummary>> GetProcedureSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
                     return await GetSummaryAsync<ProcedureRecord, ProcedureSummary>(
-                startDate, endDate,
+                sumStartDate, sumEndDate,
                 record =>
                 {
                     float totCom = CalculateTotalCommissions(record.DoctorId, record.DocComm, record.Nurse1Id, record.Nurse1Comm, record.Nurse2Id, record.Nurse2Comm);
@@ -136,14 +134,14 @@ namespace QWellApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<LabSummary>> GetLabSummary(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<LabSummary>> GetLabSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
                     return await GetSummaryAsync<LabRecord, LabSummary>(
-                startDate, endDate,
+                sumStartDate, sumEndDate,
                 record =>
                 {
                     float totCom = CalculateTotalCommissions(record.DoctorId, record.DocComm, record.Nurse1Id, record.Nurse1Comm, record.Nurse2Id, record.Nurse2Comm);
@@ -170,14 +168,14 @@ namespace QWellApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<ChannelSummary>> GetChannelSummary(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<ChannelSummary>> GetChannelSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
             {
                 using (AppDataContext context = new AppDataContext())
                 {
                     return await GetSummaryAsync<ChannelRecord, ChannelSummary>(
-                startDate, endDate,
+                sumStartDate, sumEndDate,
                 record =>
                 {
                     float totCom = CalculateTotalCommissions(record.DoctorId, record.DocComm, record.Nurse1Id, record.Nurse1Comm, record.Nurse2Id, record.Nurse2Comm);

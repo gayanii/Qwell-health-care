@@ -21,6 +21,8 @@ using System.Windows.Shapes;
 using iText.Layout.Element;
 using Microsoft.Win32;
 using System.Globalization;
+using iText.Kernel.Pdf.Canvas.Parser.ClipperLib;
+using System.ComponentModel.DataAnnotations;
 
 namespace QWellApp.Views.UserControls
 {
@@ -34,6 +36,9 @@ namespace QWellApp.Views.UserControls
         private ISupplierRepository supplierRepository;
         private ViewModelBase CurrentChildView;
         private CommissionViewModel commissionViewModel;
+        private readonly Helpers.Validation validator = new Helpers.Validation();
+        private int _previousEndValue;
+        private int _previousStartValue;
 
         public CommissionView()
         {
@@ -174,6 +179,58 @@ namespace QWellApp.Views.UserControls
         {
             Regex regex = new Regex(@"[^0-9\.]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void StartTimeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(DataContext is CommissionViewModel vm)) return;
+
+            if (CommissionStartTime.SelectedValue is int newValue)
+            {
+                var currentVmValue = vm.StartTime;
+
+                vm.StartTime = newValue;
+
+                if (!IsVmDateRangeValid(vm))
+                {
+                    vm.StartTime = _previousStartValue;
+
+                    CommissionStartTime.SelectedValue = _previousStartValue;
+                }
+                else
+                {
+                    _previousStartValue = newValue;
+                }
+            }
+        }
+
+        private void EndTimeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(DataContext is CommissionViewModel vm)) return;
+            if (CommissionEndTime.SelectedValue is int newValue)
+            {
+                var currentVmValue = vm.EndTime;
+
+                vm.EndTime = newValue;
+
+                if (!IsVmDateRangeValid(vm))
+                {
+                    vm.EndTime = _previousEndValue;
+
+                    CommissionEndTime.SelectedValue = _previousEndValue;
+                }
+                else
+                {
+                    _previousEndValue = newValue;
+                }
+            }
+        }
+
+        private bool IsVmDateRangeValid(CommissionViewModel vm)
+        {
+            var start = validator.CalculateStartDateTime(vm.StartDate, vm.StartTime);
+            var end = validator.CalculateEndDateTime(vm.EndDate, vm.EndTime);
+            return start <= end;
         }
     }
 }

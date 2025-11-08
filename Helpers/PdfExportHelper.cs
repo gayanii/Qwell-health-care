@@ -92,7 +92,7 @@ namespace QWellApp.Helpers
             summary.TotalBill.ToString()
         };
 
-        public static void ExportFullReport(SummaryViewModel summaryViewModel)
+        public static void ExportFullReport(BaseSummaryViewModel summaryViewModel)
         {
             if ((summaryViewModel.MedicalSummaryList == null || !summaryViewModel.MedicalSummaryList.Any()) &&
                 (summaryViewModel.ProcedureSummaryList == null || !summaryViewModel.ProcedureSummaryList.Any()) &&
@@ -115,7 +115,7 @@ namespace QWellApp.Helpers
                 {
                     var document = ExportToPDF(
                         saveFileDialog.FileName,
-                        $"Full Report - (From {summaryViewModel.StartDate:dd-MM-yyyy} 7.00AM to {summaryViewModel.EndDate.AddDays(1):dd-MM-yyyy} 6.59AM)"
+                        $"Full Report - (From {summaryViewModel.StartDateTime:dd-MM-yyyy HH:mm} to {summaryViewModel.EndDateTime:dd-MM-yyyy HH:mm})"
                     );
 
                     AddSummarySection(document, "Summary of the medical records", summaryViewModel.MedicalSummaryList, MedicalSummaryHeaders, extractMedicalRowData, r => (float)r.TotalBill);
@@ -217,7 +217,7 @@ namespace QWellApp.Helpers
         }
 
         public static void ExportReport(
-            SummaryViewModel summaryViewModel,
+            BaseSummaryViewModel summaryViewModel,
             string reportTitle,
             string defaultFileName,
             List<string> tableHeaders,
@@ -244,7 +244,7 @@ namespace QWellApp.Helpers
             {
                 var document = ExportToPDF(
                     saveFileDialog.FileName,
-                    $"{reportTitle} (From {summaryViewModel.StartDate:dd-MM-yyyy} 7.00AM to {summaryViewModel.EndDate.AddDays(1):dd-MM-yyyy} 6.59AM)");
+                    $"{reportTitle} (From {summaryViewModel.StartDateTime:dd-MM-yyyy HH:mm} to {summaryViewModel.EndDateTime:dd-MM-yyyy HH:mm})");
 
                 var countParagraph = new Paragraph($"Number of Patients: {summaryList.Count()}")
                     .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT)
