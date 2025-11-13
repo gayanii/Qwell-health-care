@@ -23,7 +23,8 @@
 
     <Grid>
         
-        <Grid x:Name="ProductListView">
+        <Grid x:Name="ProductListView"
+              Visibility="{Binding Path=ProductListVisibility, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition/>
@@ -136,12 +137,25 @@
                 <Binding Path="UpdateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
             </Grid.Visibility>
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <StackPanel 
+                Panel.ZIndex="10"
+                Grid.RowSpan="2"
+                Orientation="Horizontal" Margin="-20,20,0,0" VerticalAlignment="Top">
+                <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                    <fa:IconImage Icon="ArrowLeft" Height="25" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                </Button>
+            </StackPanel>
 
             <!--Left Section-->
-            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Border Grid.Row="1" Style="{StaticResource CreateUpdateBorderStyle}">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -166,20 +180,14 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-300 -80">
-                        <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
-                            <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
-                        </Button>
-                    </StackPanel>
-
                     <TextBlock Grid.Row="0" Text="Brand Name *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="1" Margin="50 0 0 10" Text="{Binding BrandNameErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding BrandNameErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="Generic *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="50 0 0 10" Text="{Binding GenericErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding GenericErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Current Quantity *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="5" Margin="50 0 0 10" Text="{Binding CurrentQtyErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="5" Margin="30 0 0 10" Text="{Binding CurrentQtyErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="6" Text="Selling Price *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="7" Margin="50 0 0 10" Text="{Binding SellingPriceErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="7" Margin="30 0 0 10" Text="{Binding SellingPriceErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="8" Text="Status" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="9" Text="" Style="{StaticResource textError}" />
 
@@ -189,7 +197,7 @@
                     <uc:TextBoxUserControl x:Name="SelllingPrice" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter selling price" Text="{Binding SellingPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <ComboBox x:Name="Status" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding StatusList}" Text="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686"/>
 
-                    <Grid Grid.Column="1" Grid.Row="10" Margin="0 40 0 0">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="10" Margin="0 40 0 0" HorizontalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -213,11 +221,25 @@
                 <Binding Path="CreateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
             </Grid.Visibility>
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel 
+                Panel.ZIndex="10"
+                Grid.RowSpan="2"
+                Orientation="Horizontal" Margin="-20,20,0,0" VerticalAlignment="Top">
+                <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                    <fa:IconImage Icon="ArrowLeft" Height="25" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                </Button>
+            </StackPanel>
+
             <!--Left Section-->
-            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Border Grid.Row="1" Style="{StaticResource CreateUpdateBorderStyle}">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -240,30 +262,26 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-300 -110">
-                        <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
-                            <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
-                        </Button>
-                    </StackPanel>
+                    
 
                     <TextBlock Grid.Row="0" Text="Brand Name *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="1" Margin="50 0 0 10" Text="{Binding BrandNameErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding BrandNameErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="Generic *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="50 0 0 10" Text="{Binding GenericErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding GenericErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Current Quantity *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="5" Margin="50 0 0 10" Text="{Binding CurrentQtyErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="5" Margin="30 0 0 10" Text="{Binding CurrentQtyErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="6" Text="Selling Price *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="7" Margin="50 0 0 10" Text="{Binding SellingPriceErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="7" Margin="30 0 0 10" Text="{Binding SellingPriceErrorMessage}" Style="{StaticResource textError}" />
 
                     <uc:TextBoxUserControl x:Name="BrandNameCreate" Grid.Column="1" Grid.Row="0" Hint="Enter brand name" Text="{Binding BrandName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="GenericCreate" Grid.Column="1" Grid.Row="2" Hint="Enter generic" Text="{Binding Generic, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="CurrentQuantityCreate" Grid.Column="1" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Hint="Enter current quantity" Text="{Binding CurrentQty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="SelllingPriceCreate" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter selling price" Text="{Binding SellingPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <Grid Grid.Column="1" Grid.Row="10" Margin="0 40 0 0">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="10" Margin="0 40 0 0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="0.5*"/>
                         </Grid.ColumnDefinitions>
 
                         <Button Style="{StaticResource cancelButton}" Command="{Binding CancelCommand}" Margin="0 0 10 0" Content="Cancel" />

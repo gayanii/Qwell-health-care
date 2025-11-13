@@ -400,6 +400,7 @@ namespace QWellApp.ViewModels.Common
             else
             {
                 NoResultsMed = "Visible";
+                SumOfTotalMed = $"Total: {0:F2}";
             }
         }
 
@@ -416,6 +417,7 @@ namespace QWellApp.ViewModels.Common
             else
             {
                 NoResultsPro = "Visible";
+                SumOfTotalPro = $"Total: {0:F2}";
             }
         }
 
@@ -432,6 +434,7 @@ namespace QWellApp.ViewModels.Common
             else
             {
                 NoResultsLab = "Visible";
+                SumOfTotalLab = $"Total: {0:F2}";
             }
         }
 
@@ -448,6 +451,7 @@ namespace QWellApp.ViewModels.Common
             else
             {
                 NoResultsCha = "Visible";
+                SumOfTotalCha = $"Total: {0:F2}";
             }
         }
 

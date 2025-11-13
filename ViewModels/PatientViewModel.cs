@@ -513,13 +513,14 @@ namespace QWellApp.ViewModels
 
         private void ExecuteCreateCommand(object obj)
         {
-            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Gender) || 
-                string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Gender) ||
+                string.IsNullOrWhiteSpace(NIC) || string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
             {
                 FirstNameErrorMessage = (string.IsNullOrWhiteSpace(FirstName)) ? "First name is required." : "";
                 LastNameErrorMessage = (string.IsNullOrWhiteSpace(LastName)) ? "Last name is required." : "";
                 AgeErrorMessage = (string.IsNullOrWhiteSpace(Age)) ? "Age is required." : "";
                 GenderErrorMessage = (string.IsNullOrWhiteSpace(Gender)) ? "Gender is required." : "";
+                NICErrorMessage = (string.IsNullOrWhiteSpace(NIC)) ? "NIC is required." : "";
                 MobileNumErrorMessage = (string.IsNullOrWhiteSpace(Mobile)) ? "Mobile number is required." : (Mobile.Length != 10) ? "Should have 10 characters." : "";
             }
             else
@@ -606,12 +607,13 @@ namespace QWellApp.ViewModels
         private void ExecuteUpdateCommand(object obj)
         {
             if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Gender) ||
-                string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
+                string.IsNullOrWhiteSpace(NIC) || string.IsNullOrWhiteSpace(Age) || string.IsNullOrWhiteSpace(Mobile) || Mobile.Length != 10)
             {
                 FirstNameErrorMessage = (string.IsNullOrWhiteSpace(FirstName)) ? "First name is required." : "";
                 LastNameErrorMessage = (string.IsNullOrWhiteSpace(LastName)) ? "Last name is required." : "";
                 AgeErrorMessage = (string.IsNullOrWhiteSpace(Age)) ? "Age is required." : "";
                 GenderErrorMessage = (string.IsNullOrWhiteSpace(Gender)) ? "Gender is required." : "";
+                NICErrorMessage = (string.IsNullOrWhiteSpace(NIC)) ? "NIC is required." : "";
                 MobileNumErrorMessage = (string.IsNullOrWhiteSpace(Mobile)) ? "Mobile number is required." : (Mobile.Length != 10) ? "Should have 10 characters." : "";
             }
             else

@@ -23,6 +23,7 @@ using Microsoft.Win32;
 using System.Globalization;
 using iText.Kernel.Pdf.Canvas.Parser.ClipperLib;
 using System.ComponentModel.DataAnnotations;
+using QWellApp.Helpers;
 
 namespace QWellApp.Views.UserControls
 {
@@ -84,93 +85,12 @@ namespace QWellApp.Views.UserControls
             {
                 try
                 {
-                    ExportToPDF(saveFileDialog.FileName, pageName);
+                    PdfExportHelper.ExportToPDF(saveFileDialog.FileName, pageName, commissionViewModel);
                     MessageBox.Show("PDF exported successfully!");
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("An error occurred: " + ex.Message);
-                }
-            }
-        }
-
-        private void ExportToPDF(string filePath, string pageName)
-        {
-            using (PdfWriter writer = new PdfWriter(filePath))
-            {
-                using (PdfDocument pdf = new PdfDocument(writer))
-                {
-                    iText.Layout.Document document = new iText.Layout.Document(pdf);
-
-                    // Add a topic/title to the PDF
-                    iText.Layout.Element.Paragraph title = new iText.Layout.Element.Paragraph($"{pageName} Distribution Report - (From {commissionViewModel.StartDate.ToString("dd-MM-yyyy")} 7.00AM to {commissionViewModel.EndDate.AddDays(1).ToString("dd-MM-yyyy")} 6.59AM)")
-                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER) // Center the title
-                        .SetFontSize(20) // Set font size for the title
-                        .SetBold(); // Make the title bold
-
-                    document.Add(title); // Add the title to the document
-
-                    // Add some spacing between the title and tables
-                    document.Add(new iText.Layout.Element.Paragraph("\n"));
-
-                    // Create a table with the same number of columns as the DataGrid
-                    iText.Layout.Element.Table table1 = new iText.Layout.Element.Table(6);
-
-                    // Add header row with bold text
-                    table1.AddHeaderCell(new iText.Layout.Element.Cell().Add(new iText.Layout.Element.Paragraph("First Name").SetBold()));
-                    table1.AddHeaderCell(new iText.Layout.Element.Cell().Add(new iText.Layout.Element.Paragraph("Last Name").SetBold()));
-                    table1.AddHeaderCell(new iText.Layout.Element.Cell().Add(new iText.Layout.Element.Paragraph("Role").SetBold()));
-                    table1.AddHeaderCell(new iText.Layout.Element.Cell().Add(new iText.Layout.Element.Paragraph("Total Commission").SetBold()));
-                    table1.AddHeaderCell(new iText.Layout.Element.Cell().Add(new iText.Layout.Element.Paragraph("Dates").SetBold()));
-                    table1.AddHeaderCell(new iText.Layout.Element.Cell().Add(new iText.Layout.Element.Paragraph("Chit Number: Commission").SetBold()));
-
-                    // Iterate over commissions to create rows with simulated rowspan
-                    foreach (var commission in commissionViewModel.CommissionList)
-                    {
-                        // Get the number of rows to span
-                        int rowCount = Math.Max(commission.Date.Count, commission.ChitNumber.Count);
-
-                        // Add cells for the first row
-                        table1.AddCell(new iText.Layout.Element.Cell(rowCount, 1).Add(new iText.Layout.Element.Paragraph(commission.FirstName.ToString())));
-                        table1.AddCell(new iText.Layout.Element.Cell(rowCount, 1).Add(new iText.Layout.Element.Paragraph(commission.LastName.ToString())));
-
-                        // Build the Role string if needed
-                        string roles = string.Join(", ", commission.Role);
-                        table1.AddCell(new iText.Layout.Element.Cell(rowCount, 1).Add(new iText.Layout.Element.Paragraph(roles)));
-
-                        // Add total commission cell with rowspan
-                        table1.AddCell(new iText.Layout.Element.Cell(rowCount, 1).Add(new iText.Layout.Element.Paragraph(commission.TotalCommisssion.ToString())));
-
-                        // Add date and chit number cells for each row individually
-                        for (int i = 0; i < rowCount; i++)
-                        {
-                            // Add date cell
-                            if (i < commission.Date.Count)
-                            {
-                                table1.AddCell(commission.Date[i].ToString());
-                            }
-                            else
-                            {
-                                // Empty cell if no more dates are available
-                                table1.AddCell("");
-                            }
-
-                            // Add chit number cell
-                            if (i < commission.ChitNumber.Count)
-                            {
-                                table1.AddCell(commission.ChitNumber[i].ToString());
-                            }
-                            else
-                            {
-                                // Empty cell if no more chit numbers are available
-                                table1.AddCell("");
-                            }
-                        }
-                    }
-
-                    // Add the table to the document
-                    document.Add(table1);
-                    document.Close();
                 }
             }
         }

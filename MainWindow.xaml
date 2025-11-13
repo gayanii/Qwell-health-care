@@ -113,20 +113,20 @@
                     <StackPanel>
 
                         <!--Logo-->
-                        <StackPanel Orientation="Horizontal"
-                                Height="35"
-                                HorizontalAlignment="Left"
-                                Margin="15,5,0,40">
+                        <StackPanel
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Stretch"
+                                Margin="0">
 
                             <Image Source="/Assets/Images/Email.png" Height="30" />
                             <TextBlock Text="QWell"
-                                   Foreground="{StaticResource panelColor}"
-                                   FontSize="20"
+                                   Foreground="{StaticResource color19}"
+                                   FontSize="25"
                                    FontFamily="Montserrat"
                                    FontWeight="Bold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Margin="20,20,0,0" />
+                                   Padding="30,15" />
                         </StackPanel>
 
                         <!--Menu Buttons-->
@@ -260,10 +260,10 @@
                                             </Grid.RowDefinitions>
 
                                             <!-- Header Section -->
-                                            <Grid Grid.Row="0">
+                                            <Grid Grid.Row="0" Margin="-10,0,0,10">
                                                 <!-- Two columns: Header Content and Toggle Button -->
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="150" />
+                                                    <ColumnDefinition Width="200" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
@@ -282,7 +282,7 @@
                                             <!-- Content Section -->
                                             <ContentPresenter Grid.Row="1"
                                                   ContentSource="Content"
-                                                  Margin="10,0,0,0"
+                                                  Margin="0,0,0,0"
                                                   Visibility="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToVisibility}}" />
                                         </Grid>
                                     </Border>
@@ -292,32 +292,39 @@
                             <!-- Expander Header Content -->
                             <Expander.Header>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:IconImage Icon="SackDollar" Style="{StaticResource menuButtonIcon}" Margin="0,0,10,0" Foreground="{StaticResource color1}" />
+                                    <fa:IconImage Icon="SackDollar" Style="{StaticResource menuButtonIcon}" Foreground="{StaticResource color1}" />
                                     <TextBlock Text="Commissions" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Expander.Header>
 
                             <!-- Expander Content -->
-                            <StackPanel Margin="30,0,0,0">
+                            <StackPanel Margin="10,0,10,0">
                                 <RadioButton Style="{StaticResource menuButton}"
                                              Tag="{StaticResource color1}"
                                              Command="{Binding ShowMedicalCommissionViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Medical Commissions" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Medical Commissions" Style="{StaticResource menuButtonText}" />
+                                    </StackPanel>
+                                </RadioButton>
+                                <RadioButton Style="{StaticResource menuButton}"
+                                     Tag="{StaticResource color1}"
+                                     Command="{Binding ShowProcedureCommissionViewCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="   -   Procedure Commissions" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                                 <RadioButton Style="{StaticResource menuButton}"
                                              Tag="{StaticResource color1}"
                                              Command="{Binding ShowLabCommissionViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Lab Commissions" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Lab Commissions" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                                 <RadioButton Style="{StaticResource menuButton}"
-                                             Tag="{StaticResource color1}"
-                                             Command="{Binding ShowProcedureCommissionViewCommand}">
+                                     Tag="{StaticResource color1}"
+                                     Command="{Binding ShowChanellingCommissionViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Procedure Commissions" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Chanelling Commissions" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                             </StackPanel>
@@ -342,10 +349,10 @@
                                             </Grid.RowDefinitions>
 
                                             <!-- Header Section -->
-                                            <Grid Grid.Row="0">
+                                            <Grid Grid.Row="0" Margin="-10,0,0,10">
                                                 <!-- Two columns: Header Content and Toggle Button -->
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="150" />
+                                                    <ColumnDefinition Width="200" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
@@ -374,39 +381,39 @@
                             <!-- Expander Header Content -->
                             <Expander.Header>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <fa:IconImage Icon="ClipboardList" Style="{StaticResource menuButtonIcon}" Margin="0,0,10,0" Foreground="{StaticResource color3}" />
+                                    <fa:IconImage Icon="ClipboardList" Style="{StaticResource menuButtonIcon}" Foreground="{StaticResource color3}" />
                                     <TextBlock Text="Reports" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Expander.Header>
 
                             <!-- Expander Content -->
-                            <StackPanel Margin="30,0,0,0">
+                            <StackPanel Margin="0,0,10,0">
                                 <RadioButton Style="{StaticResource menuButton}"
                                      Tag="{StaticResource color3}"
                                      Command="{Binding ShowMedicalReportViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Medical Reports" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Medical Reports" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                                 <RadioButton Style="{StaticResource menuButton}"
                                      Tag="{StaticResource color3}"
                                      Command="{Binding ShowProcedureReportViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Procedure Reports" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Procedure Reports" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                                 <RadioButton Style="{StaticResource menuButton}"
                                      Tag="{StaticResource color3}"
                                      Command="{Binding ShowLabReportViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Lab Reports" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Lab Reports" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                                 <RadioButton Style="{StaticResource menuButton}"
                                      Tag="{StaticResource color3}"
                                      Command="{Binding ShowChanellingReportViewCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text=" - Chanelling Reports" Style="{StaticResource menuButtonText}" />
+                                        <TextBlock Text="   -   Chanelling Reports" Style="{StaticResource menuButtonText}" />
                                     </StackPanel>
                                 </RadioButton>
                             </StackPanel>
@@ -424,14 +431,15 @@
 
                         <!--Activity Logs-->
                         <RadioButton Style="{StaticResource menuButton}"
-                             Tag="{StaticResource color3}"
+                             Tag="{StaticResource color8}"
                              Command="{Binding ShowActivityLogsViewCommand}">
                             <StackPanel Orientation="Horizontal">
-                                <fa:IconImage Icon="ClipboardList" Style="{StaticResource menuButtonIcon}" />
+                                <fa:IconImage Icon="ListCheck" Style="{StaticResource menuButtonIcon}" />
                                 <TextBlock Text="Activity Logs" Style="{StaticResource menuButtonText}" />
                             </StackPanel>
                         </RadioButton>
-                    </StackPanel>
+
+                        </StackPanel>
                 </ScrollViewer>
             </Border>
 

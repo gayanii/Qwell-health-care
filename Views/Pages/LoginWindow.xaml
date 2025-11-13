@@ -80,12 +80,12 @@
                     </StackPanel>
                     
                     <!--Login fields-->
-                    <Border Grid.Row="1" CornerRadius="10" Background="{StaticResource color8}" Margin="80 80">
+                    <Border Grid.Row="1" CornerRadius="10" Background="{StaticResource color8}" Width="450" Margin="120 80">
                         <StackPanel VerticalAlignment="Center" >
 
-                            <TextBlock Text="Sign In" Foreground="{StaticResource color16}" Margin="30 30 50 50" Style="{StaticResource TitleText}" />
+                            <TextBlock Text="Sign In" Foreground="{StaticResource color12}" Margin="30 0 30 30" Style="{StaticResource TitleText}" />
 
-                            <Grid Margin="100 9" HorizontalAlignment="Center">
+                            <Grid Margin="10" HorizontalAlignment="Center">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto" />
                                     <ColumnDefinition Width="*" />
@@ -96,12 +96,12 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Username" Style="{StaticResource textHint}" HorizontalAlignment="Left" FontWeight="Bold"/>
-                                <TextBox Grid.Column="0" Grid.Row="1" Name="txtUsername" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Margin="10" Width="300" Style="{StaticResource normalTextBox}" />
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Username" Style="{StaticResource textHint}" HorizontalAlignment="Left" FontWeight="SemiBold"/>
+                                <TextBox Grid.Column="0" Grid.Row="1" FontSize="14" Name="txtUsername" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Margin="10" Width="300" Style="{StaticResource normalTextBox}" />
 
                             </Grid>
 
-                            <Grid Margin="100 9" HorizontalAlignment="Center">
+                            <Grid Margin="10" HorizontalAlignment="Center">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto" />
                                     <ColumnDefinition Width="*" />
@@ -113,8 +113,8 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Column="0" Grid.Row="0" x:Name="txtPassword" MouseDown="textPassword_MouseDown" Text="Password" Style="{StaticResource textHint}" FontWeight="Bold"/>
-                                <uc:PasswordUserControl Grid.Column="0" Grid.Row="1" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="-90 10" Width="500"/>
+                                <TextBlock Grid.Column="0" Grid.Row="0" x:Name="txtPassword" MouseDown="textPassword_MouseDown" Text="Password" Style="{StaticResource textHint}" FontWeight="SemiBold"/>
+                                <uc:PasswordUserControl Grid.Column="0" Grid.Row="1" FontSize="14" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="-90 10" Width="500"/>
                                 <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding ErrorMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="12" Foreground="red" Style="{StaticResource textHint}" />
                                 <!-- Loading Indicator -->
                                 <Grid Name="loadingGrid" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" Background="Transparent" Opacity="0.7">
@@ -127,14 +127,14 @@
                                 </Grid>
                             </Grid>
 
-                            <Button Content="Sign In" Command="{Binding LoginCommand}" Click="LoginBtnClicked" Margin="30 30 50 50" Style="{StaticResource mainButton}">
+                            <Button Content="Sign In" FontSize="16" Command="{Binding LoginCommand}" Click="LoginBtnClicked" Width="300" Style="{StaticResource mainButton}">
                                 <Button.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding LoginCommand}"/>
                                 </Button.InputBindings>
                             </Button>
                         </StackPanel>
                     </Border>
-                </Grid>
+                    </Grid>
             </Border>
         </Grid>
     </Border>
