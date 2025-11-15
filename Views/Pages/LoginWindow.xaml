@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QWellApp.Views.Pages"
         xmlns:uc="clr-namespace:QWellApp.UserControls"
+        xmlns:converter="clr-namespace:QWellApp.Helpers"
         xmlns:viewModel="clr-namespace:QWellApp.ViewModels"
         xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp"
         mc:Ignorable="d" Height="700" Width="700"
@@ -20,6 +21,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
+        <converter:BoolToVisibilityInverseConverter x:Key="BoolToVisibilityInverseConverter" />
     </Window.Resources>
 
     <Window.Visibility>
@@ -83,7 +85,7 @@
                     <Border Grid.Row="1" CornerRadius="10" Background="{StaticResource color8}" Width="450" Margin="120 80">
                         <StackPanel VerticalAlignment="Center" >
 
-                            <TextBlock Text="Sign In" Foreground="{StaticResource color12}" Margin="30 0 30 30" Style="{StaticResource TitleText}" />
+                            <TextBlock Text="{Binding SignInLabel}" Foreground="{StaticResource color12}" Margin="30 0 30 30" Style="{StaticResource TitleText}" />
 
                             <Grid Margin="10" HorizontalAlignment="Center">
                                 <Grid.ColumnDefinitions>
@@ -96,7 +98,7 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Username" Style="{StaticResource textHint}" HorizontalAlignment="Left" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="usernameText" Grid.Column="0" Grid.Row="0" Text="Username" Style="{StaticResource textHint}" HorizontalAlignment="Left" FontWeight="SemiBold"/>
                                 <TextBox Grid.Column="0" Grid.Row="1" FontSize="14" Name="txtUsername" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Margin="10" Width="300" Style="{StaticResource normalTextBox}" />
 
                             </Grid>
@@ -111,11 +113,16 @@
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
                                     <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Column="0" Grid.Row="0" x:Name="txtPassword" MouseDown="textPassword_MouseDown" Text="Password" Style="{StaticResource textHint}" FontWeight="SemiBold"/>
-                                <uc:PasswordUserControl Grid.Column="0" Grid.Row="1" FontSize="14" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="-90 10" Width="500"/>
-                                <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding ErrorMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="12" Foreground="red" Style="{StaticResource textHint}" />
+                                <TextBlock Grid.Column="0" Grid.Row="0" x:Name="txtPassword" MouseDown="textPassword_MouseDown" Text="Password" Style="{StaticResource textHint}" 
+                                           Visibility="{Binding IsForgotMode, Converter={StaticResource BoolToVisibilityInverseConverter}}" FontWeight="SemiBold"/>
+                                <uc:PasswordUserControl x:Name="passwordBox" Grid.Column="0" Grid.Row="1" FontSize="14" Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                        Visibility="{Binding IsForgotMode, Converter={StaticResource BoolToVisibilityInverseConverter}}" Margin="-90 10" Width="500"/>
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding ErrorMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="12" Foreground="red" Style="{StaticResource textHint}"
+                                           Visibility="{Binding IsForgotMode, Converter={StaticResource BoolToVisibilityInverseConverter}}"/>
                                 <!-- Loading Indicator -->
                                 <Grid Name="loadingGrid" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" Background="Transparent" Opacity="0.7">
                                     <ProgressBar HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="10" IsIndeterminate="True" Foreground="{StaticResource color16}" />
@@ -127,11 +134,28 @@
                                 </Grid>
                             </Grid>
 
-                            <Button Content="Sign In" FontSize="16" Command="{Binding LoginCommand}" Click="LoginBtnClicked" Width="300" Style="{StaticResource mainButton}">
+                            <Button x:Name="signInBtn" Content="Sign In" FontSize="16" Command="{Binding LoginCommand}" Click="LoginBtnClicked" Width="300" Style="{StaticResource mainButton}"
+                                    Visibility="{Binding IsForgotMode, Converter={StaticResource BoolToVisibilityInverseConverter}}">
                                 <Button.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding LoginCommand}"/>
                                 </Button.InputBindings>
                             </Button>
+
+                            <Button x:Name="SendEmailBtn" Visibility="{Binding IsForgotMode, Converter={StaticResource BooleanToVisibility}}" Content="Send Email" FontSize="16" Command="{Binding SendEmailCommand}" Width="300" Style="{StaticResource mainButton}">
+                            </Button>
+
+                            <Button 
+                                x:Name="forgotPasswordBtn"
+                                Grid.Column="0" 
+                                Grid.Row="4"
+                                Margin="0,5,0,0"
+                                Content="{Binding ForgotPasswordButtonLabel}" 
+                                Width="200"
+                                Style="{StaticResource iconButton}"
+                                Tag="{StaticResource color12}"
+                                FontWeight="Bold"
+                                FontSize="14"
+                                Command="{Binding ForgotPasswordCommand}"/>
                         </StackPanel>
                     </Border>
                     </Grid>

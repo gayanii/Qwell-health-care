@@ -93,6 +93,7 @@ namespace QWellApp.Helpers
             summary.TotalBill.ToString()
         };
 
+        // medical,procedure,lab,channel records pdf ('Download full summary' button click)
         public static void ExportFullReport(BaseSummaryViewModel summaryViewModel)
         {
             if ((summaryViewModel.MedicalSummaryList == null || !summaryViewModel.MedicalSummaryList.Any()) &&
@@ -155,6 +156,7 @@ namespace QWellApp.Helpers
             }
         }
 
+        // medical,procedure,lab,channel table templates for 'Download full summary' button click
         private static void AddSummarySection<T>(
             iText.Layout.Document document,
             string title,
@@ -201,6 +203,7 @@ namespace QWellApp.Helpers
             }
         }
 
+        // Table 2 template
         private static Table CreateSummaryTable(Report reportData)
         {
             var table = new Table(4);
@@ -217,6 +220,7 @@ namespace QWellApp.Helpers
             return table;
         }
 
+        // Individual summary report ('download medical summary', 'download lab summary' button clicks)
         public static void ExportReport(
             BaseSummaryViewModel summaryViewModel,
             string reportTitle,
@@ -288,6 +292,7 @@ namespace QWellApp.Helpers
             }
         }
 
+        // Making each report a pdf
         private static iText.Layout.Document ExportToPDF(string fileName, string title)
         {
             PdfWriter writer = new PdfWriter(fileName);
@@ -306,6 +311,7 @@ namespace QWellApp.Helpers
             return document;
         }
 
+        // Table 1 template
         private static Table Table1(List<string> headers, IEnumerable<object> summaryList, Func<object, List<string>> extractRowData, Table table)
         {
             // Table for detailed data

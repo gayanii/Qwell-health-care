@@ -1,5 +1,7 @@
 ﻿using QWell;
+using QWellApp.Helpers;
 using QWellApp.Repositories;
+using QWellApp.Services;
 using QWellApp.ViewModels.Common;
 using QWellApp.Views.Pages;
 using System;
@@ -13,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace QWellApp.ViewModels
 {
@@ -21,11 +24,13 @@ namespace QWellApp.ViewModels
         //Fields
         private string _username;
         private SecureString _password;
+        private bool _isForgotMode;
         private string _errorMessage;
         private bool _isLoginViewVisible = false;
         private bool _loadingGridVisibility;
 
         private IUserRepository userRepository;
+        protected readonly Validation validator;
 
         //Properties 
         public string Username
@@ -53,6 +58,24 @@ namespace QWellApp.ViewModels
                 OnPropertyChanged(nameof(Password));
             }
         }
+
+        public bool IsForgotMode
+        {
+            get => _isForgotMode;
+            set
+            {
+                if (_isForgotMode != value)
+                {
+                    _isForgotMode = value;
+                    OnPropertyChanged(nameof(IsForgotMode));
+
+                    // Notify dependent properties
+                    OnPropertyChanged(nameof(ForgotPasswordButtonLabel));
+                    OnPropertyChanged(nameof(SignInLabel));
+                }
+            }
+        }
+
         public string ErrorMessage
         {
             get
@@ -99,13 +122,20 @@ namespace QWellApp.ViewModels
         public ICommand RecoverPasswordCommand { get; }
         public ICommand ShowPasswordCommand { get; }
         public ICommand RememberPasswordCommand { get; }
+        public ICommand ForgotPasswordCommand { get; }
+        public ICommand SendEmailCommand { get; }
+        public string ForgotPasswordButtonLabel => IsForgotMode ? "Cancel" : "Forgot Password?";
+        public string SignInLabel => IsForgotMode ? "Forgot Password" : "Sign In";
 
         //Constructors
         public LoginViewModel()
         {
             userRepository = new UserRepository();
+            validator = new Validation();
             LoginCommand = new RelayCommand(ExecuteLoginCommand, CanExecuteLoginCommand);
             RecoverPasswordCommand = new RelayCommand(p => ExecutedRecoverPassCommand("", ""));
+            ForgotPasswordCommand = new RelayCommand(a => IsForgotMode = !IsForgotMode);
+            SendEmailCommand = new RelayCommand(ExecuteSendEmailCommand, CanExecuteSendEmailCommand);
         }
 
         private bool CanExecuteLoginCommand(object obj)
@@ -129,8 +159,7 @@ namespace QWellApp.ViewModels
             LoadingGridVisibility = true;
             try
             {
-                if (string.IsNullOrWhiteSpace(Username) || Username.Length < 3 ||
-                    string.IsNullOrWhiteSpace(Password.ToString()) || Password.Length < 3)
+                if (string.IsNullOrWhiteSpace(Username) || Username.Length < 3 || Password == null || Password.Length < 3)
                 {
                     ErrorMessage = "Invalid username or password.";
                     return;
@@ -148,7 +177,7 @@ namespace QWellApp.ViewModels
                 }
                 else
                 {
-                    ErrorMessage = "Invalid username or password.";
+                    MessageBox.Show("Invalid username or password.");
                 }
             }
             catch (Exception ex)
@@ -159,6 +188,54 @@ namespace QWellApp.ViewModels
             {
                 LoadingGridVisibility = false;
             }
+        }
+
+        private async void ExecuteSendEmailCommand(object obj)
+        {
+            if (string.IsNullOrWhiteSpace(Username))
+            {
+                ErrorMessage = "Please enter your email.";
+                return;
+            }
+
+            var user = userRepository.GetByUsername(Username);
+
+            if (user == null)
+            {
+                MessageBox.Show("This username is not registered.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                MessageBox.Show("No email is registered under this username.");
+                return;
+            }
+
+            // Generate random password
+            string newPassword = validator.GenerateRandomPassword();
+
+            // Save new password
+            bool updated = userRepository.ChangePassword(new NetworkCredential(Username, newPassword));
+
+            if (!updated)
+            {
+                MessageBox.Show("Failed to reset password.");
+                return;
+            }
+
+            // Send email
+            bool emailSent = await EmailService.SendPasswordResetEmail(user.Email, newPassword);
+
+            if (emailSent)
+                MessageBox.Show("A reset email has been sent.");
+            else
+                MessageBox.Show("Failed to send email.");
+        }
+
+        private bool CanExecuteSendEmailCommand(object obj)
+        {
+            return IsForgotMode;   // only enabled in forgot mode
         }
 
         private void ExecutedRecoverPassCommand(string username, string email)

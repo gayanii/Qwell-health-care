@@ -457,6 +457,7 @@ namespace QWellApp.ViewModels.Common
 
         protected void LoadFullReportSummary()
         {
+            // Get medical,procedure,lab,channel records list to show in the UI and in the downloaded pdf 1st table
             FullReportSummary =
                 summaryRepository.GenerateFullReport(
                     MedicalReportSummary, ProcedureReportSummary, LabReportSummary, ChannelReportSummary
