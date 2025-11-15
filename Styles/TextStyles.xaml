@@ -73,7 +73,7 @@
         <Setter Property="Template" >
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}" >
-                    <Border Background="{TemplateBinding Background}" CornerRadius="25" BorderBrush="{StaticResource color12}" Padding="15" BorderThickness="1" >
+                    <Border Background="{TemplateBinding Background}" CornerRadius="0" BorderBrush="{StaticResource color12}" Padding="15" BorderThickness="1" >
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
@@ -126,7 +126,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}" >
-                    <Border Background="{TemplateBinding Background}" CornerRadius="25" BorderBrush="{StaticResource color21}" Padding="15" BorderThickness="1" >
+                    <Border Background="{TemplateBinding Background}" CornerRadius="0" BorderBrush="{StaticResource color21}" Padding="15" BorderThickness="1" >
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
@@ -481,21 +481,25 @@
     <!-- Style for the First DataGrid Headers -->
     <Style x:Key="DataGridHeaderStyle1" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource CommonHeaderStyle}">
         <Setter Property="Background" Value="{StaticResource color11}"/>
+        <Setter Property="Height" Value="70"/>
     </Style>
 
     <!-- Style for the Second DataGrid Headers -->
     <Style x:Key="DataGridHeaderStyle2" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource CommonHeaderStyle}">
         <Setter Property="Background" Value="{StaticResource color5}"/>
+        <Setter Property="Height" Value="70"/>
     </Style>
 
     <!-- Style for the Third DataGrid Headers -->
     <Style x:Key="DataGridHeaderStyle3" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource CommonHeaderStyle}">
         <Setter Property="Background" Value="{StaticResource color2}"/>
+        <Setter Property="Height" Value="70"/>
     </Style>
 
     <!-- Style for the Fourth DataGrid Headers -->
     <Style x:Key="DataGridHeaderStyle4" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource CommonHeaderStyle}">
-        <Setter Property="Background" Value="{StaticResource color3}"/>
+        <Setter Property="Background" Value="{StaticResource color7}"/>
+        <Setter Property="Height" Value="70"/>
     </Style>
 
 </ResourceDictionary>

@@ -323,6 +323,10 @@ namespace QWellApp.ViewModels
             {
                 commissions = await commissionRepository.GetProcedureCommissions(StartDateTime, EndDateTime);
             }
+            if (pageName == "Chanelling Commissions")
+            {
+                commissions = await commissionRepository.GetChannelCommissions(StartDateTime, EndDateTime);
+            }
             CommissionList = commissions;
             //Report report = await summaryRepository.GenerateReport(summaries, date);
             //ReportSummary = report;

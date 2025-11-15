@@ -21,7 +21,8 @@
     </UserControl.Resources>
 
     <Grid>
-        <Grid x:Name="SupplierListView">
+        <Grid x:Name="SupplierListView"
+             Visibility="{Binding Path=SupplierListVisibility, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition/>
@@ -129,7 +130,21 @@
                 <Binding Path="UpdateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
             </Grid.Visibility>
 
-            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel 
+                Panel.ZIndex="10"
+                Grid.RowSpan="2"
+                Orientation="Horizontal" Margin="-20,20,0,0" VerticalAlignment="Top">
+                <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                    <fa:IconImage Icon="ArrowLeft" Height="25" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                </Button>
+            </StackPanel>
+
+            <Border Grid.Row="1" Style="{StaticResource CreateUpdateBorderStyle}">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="160"/>
@@ -150,12 +165,6 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-320 -75">
-                        <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
-                            <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
-                        </Button>
-                    </StackPanel>
-
                     <TextBlock Grid.Row="0" Text="Company *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="60 0 0 10" Text="{Binding CompanyErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="Email Address *" Style="{StaticResource text}"/>
@@ -173,7 +182,7 @@
                     <uc:TextBoxUserControl x:Name="TelephoneNum" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter address2" Text="{Binding Telephone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <ComboBox x:Name="Status" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding StatusList}" Text="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686"/>
 
-                    <Grid Grid.Column="1" Grid.Row="11" Margin="0 40 0 0">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="11" HorizontalAlignment="Center" Margin="0 40 0 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -196,7 +205,21 @@
                 <Binding Path="CreateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
             </Grid.Visibility>
 
-            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel 
+                Panel.ZIndex="10"
+                Grid.RowSpan="2"
+                Orientation="Horizontal" Margin="-20,20,0,0" VerticalAlignment="Top">
+                <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                    <fa:IconImage Icon="ArrowLeft" Height="25" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                </Button>
+            </StackPanel>
+
+            <Border Grid.Row="1"  Style="{StaticResource CreateUpdateBorderStyle}">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="160"/>
@@ -217,12 +240,6 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-320 -110">
-                        <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
-                            <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
-                        </Button>
-                    </StackPanel>
-
                     <TextBlock Grid.Row="0" Text="Company *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="60 0 0 10" Text="{Binding CompanyErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="Email Address *" Style="{StaticResource text}"/>
@@ -237,7 +254,7 @@
                     <uc:TextBoxUserControl x:Name="AddressCreate" Grid.Column="1" Grid.Row="4" Hint="Enter address1" Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <uc:TextBoxUserControl x:Name="TelephoneNumCreate" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter address2" Text="{Binding Telephone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <Grid Grid.Column="1" Grid.Row="12" Margin="0 30 0 0">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="12" HorizontalAlignment="Center" Margin="0 30 0 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>

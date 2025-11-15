@@ -22,7 +22,8 @@
     </UserControl.Resources>
     
     <Grid>
-        <Grid x:Name="PatientListView">
+        <Grid x:Name="PatientListView"
+            Visibility="{Binding Path=PatientListVisibility, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition/>
@@ -134,12 +135,25 @@
                 <Binding Path="UpdateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
             </Grid.Visibility>
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel 
+                Panel.ZIndex="10"
+                Grid.RowSpan="2"
+                Orientation="Horizontal" Margin="-20,20,0,0" VerticalAlignment="Top">
+                <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                    <fa:IconImage Icon="ArrowLeft" Height="25" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                </Button>
+            </StackPanel>
 
             <!--Left Section-->
-            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Border Grid.Row="1"  Style="{StaticResource CreateUpdateBorderStyle}">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -155,12 +169,6 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-80 -125">
-                        <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
-                            <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
-                        </Button>
-                    </StackPanel>
 
                     <TextBlock Grid.Row="0" Text="First Name *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding FirstNameErrorMessage}" Style="{StaticResource textError}" />
@@ -183,7 +191,7 @@
             </Border>
 
             <!--Right Section-->
-            <Border Grid.Column="1" Padding="10" Margin="0" Background="{StaticResource color8}" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Border Grid.Row="1" Grid.Column="1"  Style="{StaticResource CreateUpdateBorderStyle}">
 
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
@@ -207,11 +215,11 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Gender *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="1" Margin="60 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="NIC *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="70 0 0 10" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="3" Margin="50 0 0 10" Text="{Binding NICErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Age *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="5" Margin="70 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="5" Margin="50 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="6" Text="AllergicHistory" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="8" Text="Weight (kg)" Style="{StaticResource text}"/>
@@ -227,7 +235,7 @@
                         <RadioButton x:Name="Female" Foreground="{StaticResource color23}" FontWeight="Bold" IsChecked="{Binding Path=Gender,  Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Female}" Margin="5" Content="Female" />
                     </StackPanel>
 
-                    <Grid Grid.Column="1" Grid.Row="10" Margin="0 40 0 0">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="10" HorizontalAlignment="Center" Margin="0 40 0 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -254,11 +262,25 @@
                 <Binding Path="CreateGridVisibility" Mode="TwoWay" Converter="{StaticResource BoolToVisibilityConverter}"/>
             </Grid.Visibility>
 
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel 
+                Panel.ZIndex="10"
+                Grid.RowSpan="2"
+                Orientation="Horizontal" Margin="-20,20,0,0" VerticalAlignment="Top">
+                <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
+                    <fa:IconImage Icon="ArrowLeft" Height="25" Width="25" Style="{StaticResource iconButtonIcon}"/>
+                </Button>
+            </StackPanel>
+
             <!--Left Section-->
-            <Border Background="{StaticResource color8}" Padding="10" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Border Grid.Row="1"  Style="{StaticResource CreateUpdateBorderStyle}">
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -275,12 +297,6 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Grid.Column="0" Margin="-80 -155">
-                        <Button Style="{StaticResource iconButton}" Tag="{StaticResource color18}" Command="{Binding BackToListCommand}">
-                            <fa:IconImage Icon="ArrowLeft" Height="30" Width="25" Style="{StaticResource iconButtonIcon}"/>
-                        </Button>
-                    </StackPanel>
 
                     <TextBlock Grid.Row="0" Text="First Name *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding FirstNameErrorMessage}" Style="{StaticResource textError}" />
@@ -300,7 +316,7 @@
             </Border>
 
             <!--Right Section-->
-            <Border Grid.Column="1" Padding="10" Background="{StaticResource color8}" CornerRadius="10" BorderThickness="2" BorderBrush="{StaticResource panelActiveColor}">
+            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CreateUpdateBorderStyle}">
 
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
@@ -324,11 +340,11 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Gender *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="1" Margin="60 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="2" Text="NIC *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="70 0 0 10" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="3" Margin="50 0 0 10" Text="{Binding NICErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Age *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="5" Margin="70 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="5" Margin="50 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="6" Text="AllergicHistory" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="8" Text="Weight (kg)" Style="{StaticResource text}"/>
@@ -344,7 +360,7 @@
                         <RadioButton x:Name="FemaleCreate" Foreground="{StaticResource color23}" FontWeight="Bold" IsChecked="{Binding Path=Gender,  Mode=TwoWay, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Female}" Margin="5" Content="Female" />
                     </StackPanel>
 
-                    <Grid Grid.Column="1" Grid.Row="10" Margin="0 10 0 0">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="10" HorizontalAlignment="Center" Margin="0 40 0 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>

@@ -107,6 +107,7 @@ namespace QWellApp.ViewModels
         public ICommand ShowMedicalCommissionViewCommand { get; }
         public ICommand ShowLabCommissionViewCommand { get; }
         public ICommand ShowProcedureCommissionViewCommand { get; }
+        public ICommand ShowChanellingCommissionViewCommand { get; }
         public ICommand ShowMedicalReportViewCommand { get; }
         public ICommand ShowProcedureReportViewCommand { get; }
         public ICommand ShowLabReportViewCommand { get; }
@@ -135,6 +136,7 @@ namespace QWellApp.ViewModels
             ShowMedicalCommissionViewCommand = new RelayCommand(ExecuteShowMedicalCommissionViewCommand);
             ShowLabCommissionViewCommand = new RelayCommand(ExecuteShowLabCommissionViewCommand);
             ShowProcedureCommissionViewCommand = new RelayCommand(ExecuteShowProcedureCommissionViewCommand);
+            ShowChanellingCommissionViewCommand = new RelayCommand(ExecuteShowChanellingCommissionViewCommand);
             ShowMedicalReportViewCommand = new RelayCommand(ExecuteShowMedicalReportViewCommand);
             ShowProcedureReportViewCommand = new RelayCommand(ExecuteShowProcedureReportViewCommand);
             ShowLabReportViewCommand = new RelayCommand(ExecuteShowLabReportViewCommand);
@@ -271,6 +273,14 @@ namespace QWellApp.ViewModels
         {
             CurrentChildView = new CommissionViewModel();
             Caption = "Procedure Commissions";
+            Icon = IconChar.SackDollar;
+            Application.Current.Properties["PageName"] = Caption;
+        }
+
+        private void ExecuteShowChanellingCommissionViewCommand(object obj)
+        {
+            CurrentChildView = new CommissionViewModel();
+            Caption = "Chanelling Commissions";
             Icon = IconChar.SackDollar;
             Application.Current.Properties["PageName"] = Caption;
         }
