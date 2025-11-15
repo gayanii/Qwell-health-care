@@ -30,6 +30,7 @@ namespace QWellApp.Repositories
             commissionRepository = new CommissionRepository();
         }
 
+        // common template to display individual summary records
         public async Task<IEnumerable<TSummary>> GetSummaryAsync<TRecord, TSummary>(
             DateTime SumStartDate, DateTime SumEndDate, 
             Func<TRecord, TSummary> createSummary,
@@ -66,6 +67,7 @@ namespace QWellApp.Repositories
         }
 
         // Wrapper methods for each summary type
+        // Get medical records list to show in the UI and in the downloaded pdf 1st table
         public async Task<IEnumerable<MedicalSummary>> GetMedicalSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
@@ -100,6 +102,7 @@ namespace QWellApp.Repositories
             }
         }
 
+        // Get procedure records list to show in the UI and in the downloaded pdf 1st table
         public async Task<IEnumerable<ProcedureSummary>> GetProcedureSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
@@ -134,6 +137,7 @@ namespace QWellApp.Repositories
             }
         }
 
+        // Get lab records list to show in the UI and in the downloaded pdf 1st table
         public async Task<IEnumerable<LabSummary>> GetLabSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
@@ -144,6 +148,7 @@ namespace QWellApp.Repositories
                 sumStartDate, sumEndDate,
                 record =>
                 {
+                    int? ab = record.DoctorId;
                     float totCom = CalculateTotalCommissions(record.DoctorId, record.DocComm, record.Nurse1Id, record.Nurse1Comm, record.Nurse2Id, record.Nurse2Comm);
                     return new LabSummary
                     {
@@ -168,6 +173,7 @@ namespace QWellApp.Repositories
             }
         }
 
+        // Get channel records list to show in the UI and in the downloaded pdf 1st table
         public async Task<IEnumerable<ChannelSummary>> GetChannelSummary(DateTime sumStartDate, DateTime sumEndDate)
         {
             try
@@ -212,7 +218,7 @@ namespace QWellApp.Repositories
             return totCom;
         }
 
-
+        // Get individual record summary to show in the downloaded pdf 2nd table
         public async Task<Report> GenerateReport<T>(IEnumerable<T> summary, DateTime startDate, DateTime endDate) where T : class
         {
             try
@@ -224,17 +230,21 @@ namespace QWellApp.Repositories
                     float? commissionTot = 0;
 
                     IEnumerable<Commission> commissions = [];
+                    // Check if medical summary report
                     if (typeof(T) == typeof(MedicalSummary)) {
                         commissions = await commissionRepository.GetMedicalCommissions(startDate, endDate);
                     }
+                    // Check if procedure summary report
                     if (typeof(T) == typeof(ProcedureSummary))
                     {
                         commissions = await commissionRepository.GetProcedureCommissions(startDate, endDate);
                     }
+                    // Check if lab summary report
                     if (typeof(T) == typeof(LabSummary))
                     {
                         commissions = await commissionRepository.GetLabCommissions(startDate, endDate);
                     }
+                    // Check if channel summary report
                     if (typeof(T) == typeof(ChannelSummary))
                     {
                         commissions = await commissionRepository.GetChannelCommissions(startDate, endDate);
@@ -273,6 +283,7 @@ namespace QWellApp.Repositories
             }
         }
 
+        // Get medical,procedure,lab,channel summary to show in the downloaded pdf 2nd table (in the 'download full summary' pdf)
         public Report GenerateFullReport(Report medicalReport, Report procedureReport, Report labReport, Report channelReport)
         {
             Report report = new Report()

@@ -150,6 +150,7 @@ namespace QWellApp.ViewModels
                     var changeSuccess = userRepository.ChangePassword(new NetworkCredential(username, NewPassword));
                     if (changeSuccess)
                     {
+                        ExecuteResetPasswordCommand(null);
                         mainViewModel.CurrentChildView = new ProductViewModel();
                     }
                 }
@@ -162,33 +163,9 @@ namespace QWellApp.ViewModels
 
         private void ExecuteResetPasswordCommand(object obj)
         {
-            ClearSecureString(OldPassword);
-            ClearSecureString(NewPassword);
-            ClearSecureString(ConfirmPassword);
-        }
-
-        private string ConvertToUnsecureString(SecureString secureString)
-        {
-            if (secureString == null) return string.Empty;
-            IntPtr ptr = Marshal.SecureStringToBSTR(secureString);
-            try
-            {
-                return Marshal.PtrToStringBSTR(ptr);
-            }
-            finally
-            {
-                Marshal.ZeroFreeBSTR(ptr);
-            }
-        }
-
-        private void ClearSecureString(SecureString secureString)
-        {
-            if (secureString != null)
-            {
-                secureString.Clear();
-                //secureString.Dispose();
-                //secureString = null;
-            }
+            OldPassword = new SecureString();
+            NewPassword = new SecureString();
+            ConfirmPassword = new SecureString();
         }
 
         private bool CanExecuteChangePasswordCommand(object obj)

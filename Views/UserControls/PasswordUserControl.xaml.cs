@@ -24,7 +24,11 @@ namespace QWellApp.UserControls
     public partial class PasswordUserControl : UserControl
     {
         public static readonly DependencyProperty PasswordProperty =
-            DependencyProperty.Register("Password", typeof(SecureString), typeof(PasswordUserControl));
+    DependencyProperty.Register(
+        "Password",
+        typeof(SecureString),
+        typeof(PasswordUserControl),
+        new PropertyMetadata(null, OnPasswordChangedFromVM));
 
         public SecureString Password
         {
@@ -44,7 +48,25 @@ namespace QWellApp.UserControls
         private void OnPasswordChanged(object sender, RoutedEventArgs e)
         {
             Password = txtPassword.SecurePassword;
-        } 
+        }
+
+        private static void OnPasswordChangedFromVM(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as PasswordUserControl;
+            var newValue = e.NewValue as SecureString;
+
+            // If VM sets an *empty* SecureString → clear UI
+            if (newValue != null && newValue.Length == 0)
+            {
+                control.txtPassword.Clear();
+            }
+
+            // Also handle null case if needed
+            if (newValue == null)
+            {
+                control.txtPassword.Clear();
+            }
+        }
 
         public void aa()
         {

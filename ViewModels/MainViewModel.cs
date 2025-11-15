@@ -321,7 +321,7 @@ namespace QWellApp.ViewModels
         {
             CurrentChildView = new ActivityLogViewModel();
             Caption = "Activity Logs";
-            Icon = IconChar.TruckMedical;
+            Icon = IconChar.ListCheck;
             Application.Current.Properties["PageName"] = Caption;
         }
 
@@ -329,7 +329,7 @@ namespace QWellApp.ViewModels
         {
             CurrentChildView = new ChangePasswordViewModel();
             Caption = "Change Password";
-            Icon = IconChar.ArrowTrendUp;
+            Icon = IconChar.RightLeft;
             Application.Current.Properties["PageName"] = Caption;
         }
 
