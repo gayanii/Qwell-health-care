@@ -18,7 +18,7 @@ namespace QWellApp.Helpers
     {
         private static readonly List<string> LabSummaryHeaders = new List<string>
         {
-            "ID", "Chit Number", "Admit Date", "Lab Bill", "Lab Paid Cost",
+            "ID", "Chit Number", "Admit Date", "Lab Bill", "Lab Paid Cost", "Qwell Commission",
             "Consultation Fee", "Consumable Charges", "Total Commissions", "Total Bill"
         };
 
@@ -48,6 +48,7 @@ namespace QWellApp.Helpers
             summary.AdmitDate.ToString(),
             summary.LabBill.ToString(),
             summary.LabPaidCost.ToString(),
+            summary.QwellCommission.ToString(),
             summary.ConsultantFee.ToString(),
             summary.ConsumableBill.ToString(),
             summary.TotalCommisions.ToString(),
@@ -122,7 +123,7 @@ namespace QWellApp.Helpers
 
                     AddSummarySection(document, "Summary of the medical records", summaryViewModel.MedicalSummaryList, MedicalSummaryHeaders, extractMedicalRowData, r => (float)r.TotalBill);
                     AddSummarySection(document, "Summary of the procedure records", summaryViewModel.ProcedureSummaryList, ProcedureSummaryHeaders, extractProcedureRowData, r => (float)r.TotalBill);
-                    AddSummarySection(document, "Summary of the lab records", summaryViewModel.LabSummaryList, LabSummaryHeaders, extractLabRowData, r => (float)r.TotalBill);
+                    AddHospitalWiseSections(document, summaryViewModel.HospitalSummaries, LabSummaryHeaders, extractLabRowData, r => (float)r.TotalBill);
                     AddSummarySection(document, "Summary of the channelling records", summaryViewModel.ChannelSummaryList, ChannelSummaryHeaders, extractChannelRowData, r => (float)r.TotalBill);
 
                     // Total summary
@@ -203,24 +204,47 @@ namespace QWellApp.Helpers
             }
         }
 
+        // To loop through each hospital
+        private static void AddHospitalWiseSections<T>(
+            iText.Layout.Document document,
+            Dictionary<string, List<T>> groupedData,
+            List<string> headers,
+            Func<T, List<string>> extractRowData,
+            Func<T, float>? extractTotal = null)
+        {
+            foreach (var hospital in groupedData)
+            {
+                string hospitalName = hospital.Key;
+                var list = hospital.Value;
+
+                // Title for this hospital
+                string title = $"Summary for {hospitalName} lab";
+
+                AddSummarySection(document, title, list, headers, extractRowData, extractTotal);
+            }
+        }
+
+
         // Table 2 template
         private static Table CreateSummaryTable(Report reportData)
         {
-            var table = new Table(4);
+            var table = new Table(5);
             table.AddHeaderCell(new Cell().Add(new Paragraph("Total Income").SetBold()));
             table.AddHeaderCell(new Cell().Add(new Paragraph("Total Lab Paid").SetBold()));
+            table.AddHeaderCell(new Cell().Add(new Paragraph("Qwell Commission").SetBold()));
             table.AddHeaderCell(new Cell().Add(new Paragraph("Total Commissions").SetBold()));
             table.AddHeaderCell(new Cell().Add(new Paragraph("Balance (Total Income - Total Lab Paid - Total Commissions)").SetBold()));
 
             table.AddCell($"{Math.Round(reportData.TotalIncome ?? 0, 2):N2}");
             table.AddCell($"{Math.Round(reportData.TotalLabPaid ?? 0, 2):N2}");
+            table.AddCell($"{Math.Round(reportData.QwellCommission ?? 0, 2):N2}");
             table.AddCell($"{Math.Round(reportData.TotalCommissions ?? 0, 2):N2}");
             table.AddCell($"{Math.Round(reportData.Balance ?? 0, 2):N2}");
 
             return table;
         }
 
-        // Individual summary report ('download medical summary', 'download lab summary' button clicks)
+        // Individual summary report ('download medical summary', 'download procedure summary', 'download channel summary' button clicks)
         public static void ExportReport(
             BaseSummaryViewModel summaryViewModel,
             string reportTitle,
@@ -269,6 +293,99 @@ namespace QWellApp.Helpers
                     .SetMarginBottom(10);
 
                 document.Add(totalText);
+
+                var spacerText = new Paragraph("Total Summary")
+                    .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                    .SetFontSize(14)
+                    .SetBold()
+                    .SetMarginTop(10)
+                    .SetMarginBottom(10);
+
+                document.Add(spacerText);
+
+                // Table 2 (Summary)
+                var table2 = CreateSummaryTable(reportSummary);
+                document.Add(table2);
+
+                document.Close();
+                MessageBox.Show("PDF exported successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occurred: " + ex.Message);
+            }
+        }
+
+        // Lab summary report ('download lab summary' button click)
+        public static void ExportHospitalWiseReport(
+            BaseSummaryViewModel summaryViewModel,
+            string reportTitle,
+            string defaultFileName,
+            List<string> tableHeaders,
+            Dictionary<string, List<LabSummary>> hospitalSummaries,
+            Func<object, List<string>> extractRowData,
+            Report reportSummary)
+        {
+            if (hospitalSummaries == null || hospitalSummaries.Count == 0)
+            {
+                MessageBox.Show("No summary available to export.");
+                return;
+            }
+
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "PDF Files (*.pdf)|*.pdf",
+                FileName = $"{defaultFileName}-{summaryViewModel.StartDate:dd-MM-yyyy}-to-{summaryViewModel.EndDate:dd-MM-yyyy}.pdf"
+            };
+
+            if (saveFileDialog.ShowDialog() != true)
+                return;
+
+            try
+            {
+                var document = ExportToPDF(
+                    saveFileDialog.FileName,
+                    $"{reportTitle} (From {summaryViewModel.StartDateTime:dd-MM-yyyy HH:mm} to {summaryViewModel.EndDateTime:dd-MM-yyyy HH:mm})"
+                );
+
+                foreach (var hospitalEntry in hospitalSummaries)
+                {
+                    string hospitalName = hospitalEntry.Key;
+                    var list = hospitalEntry.Value;
+
+                    // Hospital Header
+                    var hospitalHeader = new Paragraph($"{hospitalName}")
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetFontSize(16)
+                        .SetBold()
+                        .SetMarginTop(15)
+                        .SetMarginBottom(10);
+
+                    document.Add(hospitalHeader);
+
+                    // Count
+                    var countParagraph = new Paragraph($"Number of Patients: {list.Count}")
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.LEFT)
+                        .SetFontSize(12)
+                        .SetMarginBottom(8);
+
+                    document.Add(countParagraph);
+
+                    // Table 1 (Detailed Data)
+                    var table = Table1(tableHeaders, list.Cast<object>(), extractRowData, new Table(tableHeaders.Count));
+                    document.Add(table.SetMarginBottom(10));
+
+                    // Hospital Total
+                    float total = list.Sum(x => x.TotalBill);
+
+                    var totalParagraph = new Paragraph($"Total for {hospitalName}: {total:N2}")
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.RIGHT)
+                        .SetBold()
+                        .SetMarginTop(10)
+                        .SetMarginBottom(15);
+
+                    document.Add(totalParagraph);
+                }
 
                 var spacerText = new Paragraph("Total Summary")
                     .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)

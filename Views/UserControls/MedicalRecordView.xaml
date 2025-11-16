@@ -198,7 +198,7 @@
                         <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
                         <TextBlock Grid.Row="8" Text="Nurse 2 Name" Style="{StaticResource text}"/>
                         <TextBlock Grid.Row="9" Margin="20 0 0 10" Text="" Style="{StaticResource textError}" />
-                        <TextBlock Grid.Row="10" Width="155" Text="Nurse 2 Commission" Style="{StaticResource text}"/>
+                        <TextBlock Grid.Row="10" Width="155" Text="Nurse2 Commission" Style="{StaticResource text}"/>
                         <TextBlock Grid.Row="11" Text="" Style="{StaticResource textError}" />
                         <TextBlock Grid.Row="12" Text="Patient Name *" Style="{StaticResource text}"/>
                         <TextBlock Grid.Row="13" Margin="20 0 0 10" Text="{Binding PatientErrorMessage}" Style="{StaticResource textError}" />

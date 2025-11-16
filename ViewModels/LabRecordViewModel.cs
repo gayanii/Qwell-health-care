@@ -30,6 +30,7 @@ namespace QWellApp.ViewModels
         private DateTime _admitDate = DateTime.Today;
         private float _totalBill;
         private float _totalLabPaidCost;
+        private float _qwellCommission;
         private string _addedBy;
         private float _otherCharges;
         private float _consultantFee;
@@ -207,6 +208,16 @@ namespace QWellApp.ViewModels
             {
                 _totalLabPaidCost = value;
                 OnPropertyChanged(nameof(TotalLabPaidCost));
+            }
+        }
+
+        public float QwellCommission
+        {
+            get { return _qwellCommission; }
+            set
+            {
+                _qwellCommission = value;
+                OnPropertyChanged(nameof(QwellCommission));
             }
         }
 
@@ -1593,6 +1604,7 @@ namespace QWellApp.ViewModels
             AdmitDate = DateTime.Now;
             TotalBill = 0;
             TotalLabPaidCost = 0;
+            QwellCommission = 0;
             AddedBy = string.Empty;
             ConsultantFee = 0;
             LabBill = 0;
@@ -1719,6 +1731,7 @@ namespace QWellApp.ViewModels
                     ConsultantFee = ConsultantFee,
                     LabBill = LabBill,
                     TotalLabPaidCost = TotalLabPaidCost,
+                    QwellCommission = QwellCommission,
                     DoctorId = DoctorList.FirstOrDefault(x => x.Value == Doctor).Key == 0 ? (int?)null : DoctorList.FirstOrDefault(x => x.Value == Doctor).Key,
                     AddedBy = user.Id,
                     DocComm = DocComm,
@@ -1728,16 +1741,38 @@ namespace QWellApp.ViewModels
                     Nurse2Comm = Nurse2Comm,
                 };
 
+                // HashSet privents duplicated
+                HashSet<string> selectedHospitals = new HashSet<string>();
+
                 for (int i= 0 ; i < labArray.Count(); i++)
                 {
                     if (!string.IsNullOrWhiteSpace(labArray[i])) {
-                        if (labRecordTestIds.Contains(LabTests.FirstOrDefault(x => x.Value == labArray[i]).Key))
+                        // Find the selected test
+                        var selected = LabTests.FirstOrDefault(x => x.Value == labArray[i]);
+
+                        if (selected.Key == 0)
+                            continue;  // invalid value, skip
+
+                        // Extract hospital name (before the '-')
+                        string hospitalName = selected.Value.Split('-')[0].ToLower();
+                        selectedHospitals.Add(hospitalName);
+
+                        // More than one hospital detected
+                        if (selectedHospitals.Count > 1)
                         {
-                            labRecordTestIds.Remove(LabTests.FirstOrDefault(x => x.Value == labArray[i]).Key);
+                            MessageBox.Show("Please select tests from the same hospital.");
+                            return;  
                         }
-                        labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == labArray[i]).Key);
+
+                        if (labRecordTestIds.Contains(selected.Key))
+                        {
+                            labRecordTestIds.Remove(selected.Key);
+                        }
+                        labRecordTestIds.Add(selected.Key);
                     }
                 }
+                createLabRecord.HospitalName = selectedHospitals.FirstOrDefault();
+
                 for (int i = 0; i < medArray.Count(); i++)
                 {
                     if (!string.IsNullOrWhiteSpace(medArray[i]) && !string.IsNullOrWhiteSpace(doseArray[i]))
@@ -1826,6 +1861,7 @@ namespace QWellApp.ViewModels
             AdmitDate = labRecord.AdmitDate;
             TotalBill = labRecord.TotalBill;
             TotalLabPaidCost = labRecord.TotalLabPaidCost;
+            QwellCommission = labRecord.QwellCommission;
             OtherCharges = labRecord.OtherCharges ?? 0;
             ConsultantFee = labRecord.ConsultantFee ?? 0;
             LabBill = labRecord.LabBill;
@@ -1993,6 +2029,7 @@ namespace QWellApp.ViewModels
                     ConsultantFee = ConsultantFee,
                     LabBill = LabBill,
                     TotalLabPaidCost = TotalLabPaidCost,
+                    QwellCommission = QwellCommission,
                     DoctorId = DoctorList.FirstOrDefault(x => x.Value == Doctor).Key == 0 ? (int?)null : DoctorList.FirstOrDefault(x => x.Value == Doctor).Key,
                     AddedBy = user.Id,
                     DocComm = DocComm,
@@ -2002,18 +2039,37 @@ namespace QWellApp.ViewModels
                     Nurse2Comm = Nurse2Comm,
                 };
 
+                HashSet<string> selectedHospitals = new HashSet<string>();
+
                 for (int i = 0; i < labArray.Count(); i++)
                 {
                     if (!string.IsNullOrWhiteSpace(labArray[i]))
                     {
-                        if (labRecordTestIds.Contains(LabTests.FirstOrDefault(x => x.Value == labArray[i]).Key))
+                        // Find the selected test
+                        var selected = LabTests.FirstOrDefault(x => x.Value == labArray[i]);
+
+                        if (selected.Key == 0)
+                            continue;  // invalid value, skip
+
+                        // Extract hospital name (before the '-')
+                        string hospitalName = selected.Value.Split('-')[0].ToLower();
+                        selectedHospitals.Add(hospitalName);
+
+                        // More than one hospital detected
+                        if (selectedHospitals.Count > 1)
                         {
-                            labRecordTestIds.Remove(LabTests.FirstOrDefault(x => x.Value == labArray[i]).Key);
+                            MessageBox.Show("Please select tests from the same hospital.");
+                            return;  
                         }
-                        labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == labArray[i]).Key);
+                        if (labRecordTestIds.Contains(selected.Key))
+                        {
+                            labRecordTestIds.Remove(selected.Key);
+                        }
+                        labRecordTestIds.Add(selected.Key);
                         
                     }
                 }
+                updateLabRecord.HospitalName = selectedHospitals.FirstOrDefault();
 
                 for (int i = 0; i < medArray.Count(); i++)
                 {
@@ -2124,6 +2180,11 @@ namespace QWellApp.ViewModels
                     LabTotal1 = labCost;
                     LabPaid1 = float.Parse(labPaidCost);
                 }
+                else
+                {
+                    LabTotal1 = 0;
+                    LabPaid1 = float.Parse("0");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Lab2))
@@ -2135,6 +2196,11 @@ namespace QWellApp.ViewModels
                     labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == Lab2).Key);
                     LabTotal2 = labCost;
                     LabPaid2 = float.Parse(labPaidCost);
+                }
+                else
+                {
+                    LabTotal2 = 0;
+                    LabPaid2 = float.Parse("0");
                 }
             }
 
@@ -2148,6 +2214,11 @@ namespace QWellApp.ViewModels
                     LabTotal3 = labCost;
                     LabPaid3 = float.Parse(labPaidCost);
                 }
+                else
+                {
+                    LabTotal3 = 0;
+                    LabPaid3 = float.Parse("0");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Lab4))
@@ -2159,6 +2230,11 @@ namespace QWellApp.ViewModels
                     labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == Lab4).Key);
                     LabTotal4 = labCost;
                     LabPaid4 = float.Parse(labPaidCost);
+                }
+                else
+                {
+                    LabTotal4 = 0;
+                    LabPaid4 = float.Parse("0");
                 }
             }
 
@@ -2172,6 +2248,11 @@ namespace QWellApp.ViewModels
                     LabTotal5 = labCost;
                     LabPaid5 = float.Parse(labPaidCost);
                 }
+                else
+                {
+                    LabTotal5 = 0;
+                    LabPaid5 = float.Parse("0");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Lab6))
@@ -2183,6 +2264,11 @@ namespace QWellApp.ViewModels
                     labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == Lab6).Key);
                     LabTotal6 = labCost;
                     LabPaid6 = float.Parse(labPaidCost);
+                }
+                else
+                {
+                    LabTotal6 = 0;
+                    LabPaid6 = float.Parse("0");
                 }
             }
 
@@ -2196,6 +2282,11 @@ namespace QWellApp.ViewModels
                     LabTotal7 = labCost;
                     LabPaid7 = float.Parse(labPaidCost);
                 }
+                else
+                {
+                    LabTotal7 = 0;
+                    LabPaid7 = float.Parse("0");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Lab8))
@@ -2207,6 +2298,11 @@ namespace QWellApp.ViewModels
                     labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == Lab8).Key);
                     LabTotal8 = labCost;
                     LabPaid8 = float.Parse(labPaidCost);
+                }
+                else
+                {
+                    LabTotal8 = 0;
+                    LabPaid8 = float.Parse("0");
                 }
             }
 
@@ -2220,6 +2316,11 @@ namespace QWellApp.ViewModels
                     LabTotal9 = labCost;
                     LabPaid9 = float.Parse(labPaidCost);
                 }
+                else
+                {
+                    LabTotal9 = 0;
+                    LabPaid9 = float.Parse("0");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Lab10))
@@ -2231,6 +2332,11 @@ namespace QWellApp.ViewModels
                     labRecordTestIds.Add(LabTests.FirstOrDefault(x => x.Value == Lab10).Key);
                     LabTotal10 = labCost;
                     LabPaid10 = float.Parse(labPaidCost);
+                }
+                else
+                {
+                    LabTotal10 = 0;
+                    LabPaid10 = float.Parse("0");
                 }
             }
 
@@ -2309,6 +2415,7 @@ namespace QWellApp.ViewModels
 
             LabBill = LabTotal1 + LabTotal2 + LabTotal3 + LabTotal4 + LabTotal5 + LabTotal6 + LabTotal7 + LabTotal8 + LabTotal9 + LabTotal10;
             TotalLabPaidCost = LabPaid1 + LabPaid2 + LabPaid3 + LabPaid4 + LabPaid5 + LabPaid6 + LabPaid7 + LabPaid8 + LabPaid9 + LabPaid10;
+            QwellCommission = LabBill - TotalLabPaidCost;
             OtherCharges = Total1 + Total2 + Total3 + Total4 + Total5 + Total6 + Total7 + Total8 + Total9 + Total10;
             TotalBill = LabBill + OtherCharges + ConsultantFee;
 

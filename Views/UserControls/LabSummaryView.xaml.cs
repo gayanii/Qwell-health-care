@@ -40,7 +40,7 @@ namespace QWellApp.Views.UserControls
         private int _previousEndValue;
         private int _previousStartValue;
 
-        private readonly List<string> labSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "Lab Bill", "Lab Paid Cost", "Consultation Fee", "Consumable Charges", "Total Commissions", "Total Bill"};
+        private readonly List<string> labSummarytableHeaders = new List<string> { "ID", "Chit Number", "Admit Date", "Lab Bill", "Lab Paid Cost", "Qwell Commission", "Consultation Fee", "Consumable Charges", "Total Commissions", "Total Bill"};
         
         Func<dynamic, List<string>> extractLabRowData = summary => new List<string>
         {
@@ -49,6 +49,7 @@ namespace QWellApp.Views.UserControls
             summary.AdmitDate.ToString(),
             summary.LabBill.ToString(),
             summary.LabPaidCost.ToString(),
+            summary.QwellCommission.ToString(),
             summary.ConsultantFee.ToString(),
             summary.ConsumableBill.ToString(),
             summary.TotalCommisions.ToString(),
@@ -68,14 +69,15 @@ namespace QWellApp.Views.UserControls
 
         private void DownloadLabReportButton_Click(object sender, RoutedEventArgs e)
         {
-            PdfExportHelper.ExportReport(
+            PdfExportHelper.ExportHospitalWiseReport(
                 summaryViewModel,
-                "Lab Report",
-                "QWell-Lab-Summary",
+                "Lab Report - Hospital Wise",
+                "QWell-Lab-Summary-HospitalWise",
                 labSummarytableHeaders,
-                summaryViewModel.LabSummaryList.Cast<object>(),
+                summaryViewModel.HospitalSummaries,
                 extractLabRowData,
-                summaryViewModel.LabReportSummary);
+                summaryViewModel.LabReportSummary
+            );
         }
 
         private void DownloadFullReportButton_Click(object sender, RoutedEventArgs e)

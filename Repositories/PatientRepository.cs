@@ -36,7 +36,7 @@ namespace QWellApp.Repositories
                 using (AppDataContext context = new AppDataContext())
                 {
                     // Normalize case for patient search
-                    string normalizedNIC = patientModel.NIC.Trim().ToLower();
+                    string normalizedNIC = (patientModel.NIC ?? "").Trim().ToLower();
 
                     // Check if patient already exists
                     bool patientFound = context.Patients.Any(patient =>
@@ -90,7 +90,7 @@ namespace QWellApp.Repositories
                     if (patient != null)
                     {
                         // Normalize input nic for search
-                        string normalizedNIC = patientModel.NIC.Trim().ToLower();
+                        string normalizedNIC = (patientModel.NIC ?? "").Trim().ToLower();
 
                         // Check if another patient with the same name exists (excluding the current one)
                         bool patientFound = context.Patients.Any(p =>

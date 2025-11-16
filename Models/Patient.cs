@@ -17,7 +17,7 @@ namespace QWellApp.Models
         public string MobileNum { get; set; }
         public string? TelephoneNum { get; set; }
         public string Gender { get; set; }
-        public string NIC { get; set; }
+        public string? NIC { get; set; }
         public string Age { get; set; }
         public string? AllergicHistory { get; set; }
         public string? Weight { get; set; }

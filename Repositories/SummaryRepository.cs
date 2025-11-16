@@ -155,8 +155,10 @@ namespace QWellApp.Repositories
                         Id = record.Id,
                         ChitNumber = record.ChitNumber,
                         AdmitDate = record.AdmitDate.ToString("dd-MMM-yyyy HH:mm"),
+                        HospitalName = record.HospitalName,
                         LabBill = record.LabBill,
                         LabPaidCost = record.TotalLabPaidCost,
+                        QwellCommission = record.QwellCommission,
                         ConsultantFee = record.ConsultantFee ?? 0,
                         ConsumableBill = record.OtherCharges ?? 0,
                         TotalCommisions = totCom,
@@ -227,6 +229,7 @@ namespace QWellApp.Repositories
                 {
                     float? income = 0;
                     float? lapPaid = 0;
+                    float? qwellCommission = 0;
                     float? commissionTot = 0;
 
                     IEnumerable<Commission> commissions = [];
@@ -259,16 +262,18 @@ namespace QWellApp.Repositories
                         // Use reflection to check if the property 'LabPaid' exists
                         var totalBillProperty = summaryRecord.GetType().GetProperty("TotalBill");
                         var labPaidProperty = summaryRecord.GetType().GetProperty("LabPaidCost");
-
+                        var qwellCommissionProperty = summaryRecord.GetType().GetProperty("QwellCommission");
 
                         income += totalBillProperty != null ? totalBillProperty.GetValue(summaryRecord) as float? : 0;
                         lapPaid += labPaidProperty != null ? labPaidProperty.GetValue(summaryRecord) as float? : 0;
+                        qwellCommission += qwellCommissionProperty != null ? qwellCommissionProperty.GetValue(summaryRecord) as float? : 0;
                     }
                     float? balance = (income ?? 0) - (lapPaid ?? 0) - (commissionTot ?? 0);
                     Report report = new Report()
                     {
                         TotalIncome = income,
                         TotalLabPaid = lapPaid,
+                        QwellCommission = qwellCommission,
                         TotalCommissions = commissionTot,
                         Balance = (float)Math.Round(balance ?? 0, 2),
                     };
@@ -290,6 +295,7 @@ namespace QWellApp.Repositories
             {
                 TotalIncome = medicalReport.TotalIncome + procedureReport.TotalIncome + labReport.TotalIncome + channelReport.TotalIncome,
                 TotalLabPaid = medicalReport.TotalLabPaid + procedureReport.TotalLabPaid + labReport.TotalLabPaid + channelReport.TotalLabPaid,
+                QwellCommission = medicalReport.QwellCommission + procedureReport.QwellCommission + labReport.QwellCommission + channelReport.QwellCommission,
                 TotalCommissions = medicalReport.TotalCommissions + procedureReport.TotalCommissions + labReport.TotalCommissions + channelReport.TotalCommissions
             };
 
