@@ -155,7 +155,6 @@ namespace QWellApp.Repositories
                         channelRecord.OPDCharge = channelRecordModel.OPDCharge;
                         channelRecord.OtherCharges = channelRecordModel.OtherCharges;
                         channelRecord.PharmacyBill = channelRecordModel.PharmacyBill;
-                        channelRecord.AdmitDate = channelRecordModel.AdmitDate;
                         channelRecord.TotalBill = channelRecordModel.TotalBill;
                         channelRecord.PatientId = channelRecordModel.PatientId;
                         channelRecord.DoctorId = channelRecordModel.DoctorId;

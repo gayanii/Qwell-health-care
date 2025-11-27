@@ -89,7 +89,7 @@ namespace QWellApp.Repositories
                         ConsultantFee = record.ConsultantFee ?? 0,
                         OtherCharges = record.OtherCharges ?? 0,
                         TotalCommisions = totCom,
-                        TotalBill = (record.PharmacyBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0)
+                        TotalBill = (record.PharmacyBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0) + totCom
                     };
                 },
                 context.MedicalRecords.AsQueryable());
@@ -124,7 +124,7 @@ namespace QWellApp.Repositories
                         ConsultantFee = record.ConsultantFee ?? 0,
                         OtherCharges = record.OtherCharges ?? 0,
                         TotalCommisions = totCom,
-                        TotalBill = (record.ProcedureBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0)
+                        TotalBill = (record.ProcedureBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0) + totCom
                     };
                 },
                 context.ProcedureRecords.AsQueryable());
@@ -162,7 +162,7 @@ namespace QWellApp.Repositories
                         ConsultantFee = record.ConsultantFee ?? 0,
                         ConsumableBill = record.OtherCharges ?? 0,
                         TotalCommisions = totCom,
-                        TotalBill = (record.LabBill) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0)
+                        TotalBill = (record.LabBill) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0) + totCom
                     };
                 },
                 context.LabRecords.AsQueryable());
@@ -197,7 +197,7 @@ namespace QWellApp.Repositories
                         ConsultantFee = record.ConsultantFee ?? 0,
                         OtherCharges = record.OtherCharges ?? 0,
                         TotalCommisions = totCom,
-                        TotalBill = (record.PharmacyBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0)
+                        TotalBill = (record.PharmacyBill) + (record.OPDCharge ?? 0) + (record.ConsultantFee ?? 0) + (record.OtherCharges ?? 0) + totCom
                     };
                 },
                 context.ChannelRecords.AsQueryable());

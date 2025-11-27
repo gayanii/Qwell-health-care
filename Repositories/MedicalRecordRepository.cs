@@ -156,7 +156,6 @@ namespace QWellApp.Repositories
                         medicalRecord.OPDCharge = medicalRecordModel.OPDCharge;
                         medicalRecord.OtherCharges = medicalRecordModel.OtherCharges;
                         medicalRecord.PharmacyBill = medicalRecordModel.PharmacyBill;
-                        medicalRecord.AdmitDate = medicalRecordModel.AdmitDate;
                         medicalRecord.TotalBill = medicalRecordModel.TotalBill;
                         medicalRecord.PatientId = medicalRecordModel.PatientId;
                         medicalRecord.DoctorId = medicalRecordModel.DoctorId;
