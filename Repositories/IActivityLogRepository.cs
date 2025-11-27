@@ -10,6 +10,7 @@ namespace QWellApp.Repositories
     public interface IActivityLogRepository
     {
         void AddLog(ActivityLog log, UserDetails currentUser);
+        void CleanupOldActivityLogs();
         Task<IEnumerable<ActivityLogView>> GetActivityLogs(string searchWord);
     }
 }

@@ -97,6 +97,8 @@ namespace QWellApp.ViewModels
 
         private async void LoadActivityLogList(string SearchWord)
         {
+            //Delete old logs
+            activityLogRepository.CleanupOldActivityLogs();
             IEnumerable<ActivityLogView> activityLogs = await activityLogRepository.GetActivityLogs(SearchWord);
             ActivityLogList = activityLogs;
 
