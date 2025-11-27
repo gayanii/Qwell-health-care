@@ -328,6 +328,7 @@ namespace QWellApp.ViewModels.Common
             }
         }
         public ICommand InitializeCommand { get; }
+        public Dictionary<string, List<LabSummary>> HospitalSummaries { get; set; }
 
         protected BaseSummaryViewModel()
         {
@@ -424,6 +425,7 @@ namespace QWellApp.ViewModels.Common
         protected async Task LoadLabSummaryList()
         {
             LabSummaryList = await summaryRepository.GetLabSummary(StartDateTime, EndDateTime);
+            GroupByHospital();
             Report report = await summaryRepository.GenerateReport(LabSummaryList, StartDateTime, EndDateTime);
             LabReportSummary = report;
             if (LabSummaryList.Any())
@@ -436,6 +438,15 @@ namespace QWellApp.ViewModels.Common
                 NoResultsLab = "Visible";
                 SumOfTotalLab = $"Total: {0:F2}";
             }
+        }
+
+        private void GroupByHospital()
+        {
+            HospitalSummaries = LabSummaryList
+                .GroupBy(x => x.HospitalName)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            OnPropertyChanged(nameof(HospitalSummaries));
         }
 
         protected async Task LoadChannelSummaryList()

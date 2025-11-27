@@ -168,24 +168,29 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="First Name *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding FirstNameErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="2" Text="Last Name *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding LastNameErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="4" Text="Mobile Number *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="5" Margin="20 0 0 10" Text="{Binding MobileNumErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="6" Text="Telephone" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="8" Text="Status" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="0" Text="Title" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="1" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="2" Text="First Name *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding FirstNameErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="4" Text="Last Name *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="5" Margin="30 0 0 10" Text="{Binding LastNameErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="6" Text="Mobile Number *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="7" Margin="20 0 0 10" Text="{Binding MobileNumErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="8" Text="Telephone" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="9" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="10" Text="Status" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="11" Text="" Style="{StaticResource textError}" />
 
-                    <uc:TextBoxUserControl x:Name="FirstName" Grid.Column="1" Grid.Row="0" Hint="Enter first name" Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="LastName" Grid.Column="1" Grid.Row="2" Hint="Enter last name" Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="MobileNum" Grid.Column="1" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Hint="Enter mobile number" Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="Telephone" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter landline number" Text="{Binding Telephone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <ComboBox x:Name="Status" Grid.Column="1" Grid.Row="8" ItemsSource="{Binding StatusList}" Text="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686"/>
+                    <ComboBox x:Name="Title" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding TitleList}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160" />
+                    <uc:TextBoxUserControl x:Name="FirstName" Grid.Column="1" Grid.Row="2" Hint="Enter first name" Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="LastName" Grid.Column="1" Grid.Row="4" Hint="Enter last name" Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="MobileNum" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter mobile number" Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="Telephone" Grid.Column="1" Grid.Row="8" PreviewTextInput="NumberValidationTextBox" Hint="Enter landline number" Text="{Binding Telephone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox x:Name="Status" Grid.Column="1" Grid.Row="10" ItemsSource="{Binding StatusList}" Text="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="10 0" Width="160" VerticalAlignment="Center" Foreground="#868686"/>
 
                 </Grid>
             </Border>
@@ -216,7 +221,7 @@
 
                     <TextBlock Grid.Row="0" Text="Gender *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="2" Text="NIC *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="2" Text="NIC" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="3" Margin="50 0 0 10" Text="{Binding NICErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Age *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="5" Margin="50 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />
@@ -296,21 +301,26 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="First Name *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding FirstNameErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="2" Text="Last Name *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding LastNameErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="4" Text="Mobile Number *" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="5" Margin="20 0 0 10" Text="{Binding MobileNumErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="6" Text="Telephone" Style="{StaticResource text}"/>
-                    <TextBlock Grid.Row="7" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="0" Text="Title" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="1" Text="" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="2" Text="First Name *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="3" Margin="30 0 0 10" Text="{Binding FirstNameErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="4" Text="Last Name *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="5" Margin="30 0 0 10" Text="{Binding LastNameErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="6" Text="Mobile Number *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="7" Margin="20 0 0 10" Text="{Binding MobileNumErrorMessage}" Style="{StaticResource textError}" />
+                    <TextBlock Grid.Row="8" Text="Telephone" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="9" Text="" Style="{StaticResource textError}" />
 
-                    <uc:TextBoxUserControl x:Name="FirstNameCreate" Grid.Column="1" Grid.Row="0" Hint="Enter first name" Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="LastNameCreate" Grid.Column="1" Grid.Row="2" Hint="Enter last name" Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="MobileNumCreate" Grid.Column="1" Grid.Row="4" PreviewTextInput="NumberValidationTextBox" Hint="Enter mobile number" Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <uc:TextBoxUserControl x:Name="TelephoneCreate" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox"  Hint="Enter landline number" Text="{Binding Telephone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox x:Name="TitleCreate" Grid.Column="1" Grid.Row="0" ItemsSource="{Binding TitleList}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="160" />
+                    <uc:TextBoxUserControl x:Name="FirstNameCreate" Grid.Column="1" Grid.Row="2" Hint="Enter first name" Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="LastNameCreate" Grid.Column="1" Grid.Row="4" Hint="Enter last name" Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="MobileNumCreate" Grid.Column="1" Grid.Row="6" PreviewTextInput="NumberValidationTextBox" Hint="Enter mobile number" Text="{Binding Mobile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <uc:TextBoxUserControl x:Name="TelephoneCreate" Grid.Column="1" Grid.Row="8" PreviewTextInput="NumberValidationTextBox"  Hint="Enter landline number" Text="{Binding Telephone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     
                 </Grid>
             </Border>
@@ -341,7 +351,7 @@
 
                     <TextBlock Grid.Row="0" Text="Gender *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="1" Margin="30 0 0 10" Text="{Binding GenderErrorMessage}" Style="{StaticResource textError}" />
-                    <TextBlock Grid.Row="2" Text="NIC *" Style="{StaticResource text}"/>
+                    <TextBlock Grid.Row="2" Text="NIC" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="3" Margin="50 0 0 10" Text="{Binding NICErrorMessage}" Style="{StaticResource textError}" />
                     <TextBlock Grid.Row="4" Text="Age *" Style="{StaticResource text}"/>
                     <TextBlock Grid.Row="5" Margin="50 0 0 10" Text="{Binding AgeErrorMessage}" Style="{StaticResource textError}" />

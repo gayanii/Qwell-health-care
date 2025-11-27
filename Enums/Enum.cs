@@ -36,6 +36,27 @@ namespace QWellApp.Enums
         ThirdPhase = 3
     }
 
+    public enum TitleListEnum
+    {
+        [Description("Mr.")]
+        Mr,
+
+        [Description("Mrs.")]
+        Mrs,
+
+        [Description("Miss.")]
+        Miss,
+
+        [Description("Master.")]
+        Master,
+
+        [Description("Baby")]
+        Baby,
+
+        [Description("Rev.")]
+        Rev
+    }
+
     public enum EmployeeTypeEnum
     {
         [Description("Admin")]

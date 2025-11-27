@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QWellApp.DBConnection;
 
@@ -11,9 +12,11 @@ using QWellApp.DBConnection;
 namespace QWellApp.Migrations
 {
     [DbContext(typeof(AppDataContext))]
-    partial class AppDataContextModelSnapshot : ModelSnapshot
+    [Migration("20251116152632_hospitalNameAdded")]
+    partial class hospitalNameAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,9 +179,6 @@ namespace QWellApp.Migrations
 
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
-
-                    b.Property<float>("QwellCommission")
-                        .HasColumnType("real");
 
                     b.Property<float>("TotalBill")
                         .HasColumnType("real");
@@ -355,6 +355,7 @@ namespace QWellApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NIC")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
@@ -362,10 +363,6 @@ namespace QWellApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TelephoneNum")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Weight")

@@ -33,10 +33,12 @@ namespace QWellApp.Models
         public float? OtherCharges { get; set; }
         public float TotalBill { get; set; }
         public float TotalLabPaidCost { get; set; }
+        public float QwellCommission { get; set; }
         public int AddedBy { get; set; }
         public float DocComm { get; set; }
         public float Nurse1Comm { get; set; }
         public float Nurse2Comm { get; set; }
+        public string HospitalName { get; set; }
 
         public LabRecord()
         {
@@ -50,6 +52,7 @@ namespace QWellApp.Models
         public int Id { get; set; }
         public string ChitNumber { get; set; }
         public float TotalBill { get; set; }
+        public string HospitalName { get; set; }
         public string PatientName { get; set; }
         public string AdmitDate { get; set; }
         public string AddedBy { get; set; }

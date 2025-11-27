@@ -24,8 +24,10 @@ namespace QWellApp.Models
         public int Id { get; set; }
         public string ChitNumber { get; set; }
         public string AdmitDate { get; set; }
+        public string HospitalName { get; set; }
         public float LabBill { get; set; }
         public float LabPaidCost { get; set; }
+        public float QwellCommission { get; set; }
         public float ConsultantFee { get; set; }
         public float ConsumableBill { get; set; }
         public float TotalCommisions { get; set; }

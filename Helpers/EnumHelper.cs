@@ -10,7 +10,7 @@ namespace QWellApp.Helpers
 {
     public class EnumHelper
     {
-        public static string GetDescription(Enum value)
+        public static string GetDescriptionFromEnum(Enum value)
         {
             var field = value.GetType().GetField(value.ToString());
             var attribute = field.GetCustomAttributes(typeof(DescriptionAttribute), false)
@@ -25,10 +25,27 @@ namespace QWellApp.Helpers
                        .Select(e =>
                            new KeyValuePair<int, string>(
                                Convert.ToInt32(e),    // Key: int value of enum (1,2,3...)
-                               GetDescription(e)      // Value: description text
+                               GetDescriptionFromEnum(e)      // Value: description text
                            )
                        )
                        .ToList();
+        }
+
+        public static string GetDescriptionFromString<TEnum>(string enumValue) where TEnum : struct, Enum
+        {
+            if (string.IsNullOrWhiteSpace(enumValue))
+                return string.Empty;
+
+            // Try to parse the string to the enum
+            if (!Enum.TryParse<TEnum>(enumValue, true, out var parsedEnum))
+                return string.Empty;
+
+            // Get the Description attribute
+            var field = typeof(TEnum).GetField(parsedEnum.ToString());
+            var attribute = field.GetCustomAttributes(typeof(DescriptionAttribute), false)
+                                 .FirstOrDefault() as DescriptionAttribute;
+
+            return attribute?.Description ?? parsedEnum.ToString();
         }
     }
 }

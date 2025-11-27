@@ -53,10 +53,12 @@ namespace QWellApp.Repositories
                     {
                         ChitNumber = labRecordModel.ChitNumber,
                         AdmitDate = labRecordModel.AdmitDate,
+                        HospitalName = labRecordModel.HospitalName,
                         TotalBill = labRecordModel.TotalBill,
                         PatientId = labRecordModel.PatientId,
                         AddedBy = labRecordModel.AddedBy,
                         TotalLabPaidCost = labRecordModel.TotalLabPaidCost,
+                        QwellCommission = labRecordModel.QwellCommission,
                         Doctor = labRecordModel.Doctor,
                         DoctorId = labRecordModel.DoctorId,
                         ConsultantFee = labRecordModel.ConsultantFee,
@@ -176,10 +178,12 @@ namespace QWellApp.Repositories
                         // Update the necessary fields
                         labRecord.ChitNumber = labRecordModel.ChitNumber;
                         labRecord.AdmitDate = labRecordModel.AdmitDate;
+                        labRecord.HospitalName = labRecordModel.HospitalName;
                         labRecord.TotalBill = labRecordModel.TotalBill;
                         labRecord.PatientId = labRecordModel.PatientId;
                         labRecord.AddedBy = labRecordModel.AddedBy;
                         labRecord.TotalLabPaidCost = labRecordModel.TotalLabPaidCost;
+                        labRecord.QwellCommission = labRecordModel.QwellCommission;
                         labRecord.DoctorId = labRecordModel.DoctorId;
                         labRecord.ConsultantFee = labRecordModel.ConsultantFee;
                         labRecord.LabBill = labRecordModel.LabBill;
@@ -294,6 +298,7 @@ namespace QWellApp.Repositories
                         {
                             Id = lr.Id,
                             ChitNumber = lr.ChitNumber,
+                            HospitalName = lr.HospitalName,
                             TotalBill = lr.TotalBill,
                             PatientName = lr.Patient.FirstName + " " + lr.Patient.LastName,
                             AdmitDate = lr.AdmitDate.ToString("dd-MMM-yyyy HH:mm"),
