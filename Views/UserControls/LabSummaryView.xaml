@@ -90,11 +90,7 @@
                                    FontSize="18"
                                    FontWeight="Bold"
                                    Margin="0 0 0 0"/>
-                            <Border 
-                                Background="{StaticResource panelActiveColor}"
-                                CornerRadius="10" 
-                                Padding="5"
-                                Margin="0 5">
+                            <Border Style="{StaticResource TableBorderStyle}">
                                 <DataGrid ItemsSource="{Binding Value}"
                                       AutoGenerateColumns="False"
                                       CanUserAddRows="False"
