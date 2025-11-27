@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.ApplicationServices;
 using Newtonsoft.Json;
 using QWellApp.Enums;
+using QWellApp.Helpers;
 using QWellApp.Models;
 using QWellApp.Repositories;
 using QWellApp.ViewModels.Common;
@@ -23,6 +24,7 @@ namespace QWellApp.ViewModels
         private string _noResults;
         private string _searchWord = "";
         public int _selectedId;
+        private string _title = TitleListEnum.Mr.ToString();
         private string _firstName;
         private string _lastName;
         private string _mobile;
@@ -103,6 +105,19 @@ namespace QWellApp.ViewModels
             {
                 _selectedId = value;
                 OnPropertyChanged(nameof(SelectedId));
+            }
+        }
+
+        public string Title
+        {
+            get
+            {
+                return _title;
+            }
+            set
+            {
+                _title = value;
+                OnPropertyChanged(nameof(Title));
             }
         }
 
@@ -430,6 +445,8 @@ namespace QWellApp.ViewModels
             }
         }
 
+        public Dictionary<TitleListEnum, string> TitleList { get; set; }
+
         //Commands
         public ICommand LoadSearchResults { get; }
         public ICommand UpdatePatientCommand { get; }
@@ -445,6 +462,7 @@ namespace QWellApp.ViewModels
             PatientList = new List<PatientView>();
             patientRepository = new PatientRepository();
             userRepository = new UserRepository();
+            TitleList = Enum.GetValues(typeof(TitleListEnum)).Cast<TitleListEnum>().ToDictionary(t => t, t => EnumHelper.GetDescriptionFromEnum(t));
             StatusList = new List<string>() { UserStatusEnum.Active.ToString(), UserStatusEnum.Inactive.ToString() };
             LoadPatientList(SearchWord);
             activityLogRepository = new ActivityLogRepository();
@@ -491,6 +509,7 @@ namespace QWellApp.ViewModels
 
         private void ExecuteCancelCommand(object obj)
         {
+            Title = TitleListEnum.Mr.ToString();
             FirstName = string.Empty;
             LastName = string.Empty;
             Mobile = string.Empty;
@@ -527,6 +546,7 @@ namespace QWellApp.ViewModels
             {
                 Patient createPatient = new Patient()
                 {
+                    Title = Title,
                     FirstName = FirstName,
                     LastName = LastName,
                     MobileNum = Mobile,
@@ -592,6 +612,7 @@ namespace QWellApp.ViewModels
         {
             Gender = string.Empty;
             Patient patient = patientRepository.GetByID(SelectedId);
+            Title = patient.Title;
             FirstName = patient.FirstName;
             LastName = patient.LastName;
             Mobile = patient.MobileNum;
@@ -621,6 +642,7 @@ namespace QWellApp.ViewModels
                 Patient updatePatient = new Patient()
                 {
                     Id = SelectedId,
+                    Title = Title,
                     FirstName = FirstName,
                     LastName = LastName,
                     MobileNum = Mobile,
@@ -742,7 +764,19 @@ namespace QWellApp.ViewModels
 
         private void LoadPatientList(string searchWord)
         {
-            var patients = patientRepository.GetAll(searchWord);
+            var rawPatients = patientRepository.GetAll(searchWord);
+            var patients = rawPatients.Select(p => new PatientView
+            {
+                Id = p.Id,
+                Title = EnumHelper.GetDescriptionFromString<TitleListEnum>(p.Title),
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                MobileNum = p.MobileNum,
+                Age = p.Age,
+                NIC = p.NIC,
+                Status = p.Status.ToString()
+            }).ToList();
+
             PatientList = patients;
             if (patients.Any())
             {

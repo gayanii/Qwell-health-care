@@ -83,6 +83,7 @@ namespace QWellApp.Views.UserControls
                     DataContext = viewModel;
                     ((PatientViewModel)DataContext).SelectedId = selectedItemId;
 
+                    Title.IsEnabled = true;
                     FirstName.IsEnabled = true;
                     LastName.IsEnabled = true;
                     MobileNum.IsEnabled = true;
@@ -174,6 +175,7 @@ namespace QWellApp.Views.UserControls
                 ((PatientViewModel)DataContext).SelectedId = selectedRowData.Id;
                 ((PatientViewModel)DataContext).GetPatientDetails.Execute(null);
 
+                Title.IsEnabled = false;
                 FirstName.IsEnabled = false;
                 LastName.IsEnabled = false;
                 MobileNum.IsEnabled = false;

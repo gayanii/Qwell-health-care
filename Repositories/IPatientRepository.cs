@@ -13,6 +13,6 @@ namespace QWellApp.Repositories
         bool Edit(Patient patientModel);
         bool Remove(int id);
         Patient GetByID(int id);
-        IEnumerable<PatientView> GetAll(string searchWord);
+        IEnumerable<Patient> GetAll(string searchWord);
     }
 }

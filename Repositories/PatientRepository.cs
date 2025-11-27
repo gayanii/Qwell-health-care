@@ -39,8 +39,8 @@ namespace QWellApp.Repositories
                     string normalizedNIC = (patientModel.NIC ?? "").Trim().ToLower();
 
                     // Check if patient already exists
-                    bool patientFound = context.Patients.Any(patient =>
-                        patient.NIC.Trim().ToLower() == normalizedNIC);
+                    bool patientFound = !string.IsNullOrWhiteSpace(normalizedNIC) ? context.Patients.Any(patient =>
+                        patient.NIC.Trim().ToLower() == normalizedNIC) : false;
 
                     if (patientFound)
                     {
@@ -51,6 +51,7 @@ namespace QWellApp.Repositories
                     // Create new patient
                     var newPatient = new Patient
                     {
+                        Title = patientModel.Title,
                         FirstName = patientModel.FirstName,
                         LastName = patientModel.LastName,
                         Gender = patientModel.Gender,
@@ -93,9 +94,9 @@ namespace QWellApp.Repositories
                         string normalizedNIC = (patientModel.NIC ?? "").Trim().ToLower();
 
                         // Check if another patient with the same name exists (excluding the current one)
-                        bool patientFound = context.Patients.Any(p =>
+                        bool patientFound = !string.IsNullOrWhiteSpace(normalizedNIC) ? context.Patients.Any(p =>
                             p.NIC.Trim().ToLower() == normalizedNIC && 
-                            p.Id != patientModel.Id);
+                            p.Id != patientModel.Id) : false;
 
                         if (patientFound)
                         {
@@ -105,6 +106,7 @@ namespace QWellApp.Repositories
                         else
                         {
                             // Update the patient's details
+                            patient.Title = patientModel.Title;
                             patient.FirstName = patientModel.FirstName;
                             patient.LastName = patientModel.LastName;
                             patient.MobileNum = patientModel.MobileNum;
@@ -133,10 +135,10 @@ namespace QWellApp.Repositories
             }
         }
 
-
-        public IEnumerable<PatientView> GetAll(string searchWord)
+        // Patient GetAll is different from other GetAll methods as the Title logic is in ViewModel
+        public IEnumerable<Patient> GetAll(string searchWord)
         {
-            List<PatientView> patients = new List<PatientView>();
+            List<Patient> patients = new List<Patient>();
             try
             {
                 using (AppDataContext context = new AppDataContext())
@@ -146,6 +148,7 @@ namespace QWellApp.Repositories
 
                     var patientList = context.Patients
                         .Where(p =>
+                            p.Title.ToLower().Contains(normalizedSearchWord) || 
                             p.FirstName.ToLower().Contains(normalizedSearchWord) ||
                             p.LastName.ToLower().Contains(normalizedSearchWord) ||
                             p.MobileNum.Contains(normalizedSearchWord) ||
@@ -157,16 +160,6 @@ namespace QWellApp.Repositories
                             p.Status.ToLower().Contains(normalizedSearchWord) || 
                             p.Gender.ToLower().Contains(normalizedSearchWord))
                         .OrderBy(p => p.FirstName) // Sort FirstName in ascending order
-                        .Select(p => new PatientView // Projecting directly to PatientView
-                        {
-                            Id = p.Id,
-                            FirstName = p.FirstName,
-                            LastName = p.LastName,
-                            MobileNum = p.MobileNum,
-                            Age = p.Age,
-                            NIC = p.NIC,
-                            Status = p.Status.ToString(),
-                        })
                         .ToList();
 
                     patients.AddRange(patientList); // Add all projected patients to the list
@@ -199,9 +192,13 @@ namespace QWellApp.Repositories
                     {
                         if (reader.Read())
                         {
+                            int titleIndex = reader.GetOrdinal("Title");
+                            string title = reader.IsDBNull(titleIndex) ? null : reader.GetString(titleIndex);
+
                             patient = new Patient
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Title = string.IsNullOrWhiteSpace(title) ? TitleListEnum.Mr.ToString() : title,
                                 FirstName = reader.IsDBNull(reader.GetOrdinal("FirstName")) ? null : reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.IsDBNull(reader.GetOrdinal("LastName")) ? null : reader.GetString(reader.GetOrdinal("LastName")),
                                 MobileNum = reader.IsDBNull(reader.GetOrdinal("MobileNum")) ? null : reader.GetString(reader.GetOrdinal("MobileNum")),
