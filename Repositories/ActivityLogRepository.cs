@@ -43,6 +43,27 @@ namespace QWellApp.Repositories
             }
         }
 
+        public void CleanupOldActivityLogs()
+        {
+            try
+            {
+                using (var context = new AppDataContext())
+                {
+                    // Calculate the cutoff date (3 months ago)
+                    DateTime cutoffDate = DateTime.Now.AddMonths(-3);
+
+                    // Direct SQL delete is faster
+                    context.Database.ExecuteSqlRaw(
+                        "DELETE FROM ActivityLogs WHERE Date < {0}", cutoffDate);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error cleaning old activity logs: {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<ActivityLogView>> GetActivityLogs(string searchWord)
         {
             try

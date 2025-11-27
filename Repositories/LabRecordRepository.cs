@@ -177,7 +177,6 @@ namespace QWellApp.Repositories
 
                         // Update the necessary fields
                         labRecord.ChitNumber = labRecordModel.ChitNumber;
-                        labRecord.AdmitDate = labRecordModel.AdmitDate;
                         labRecord.HospitalName = labRecordModel.HospitalName;
                         labRecord.TotalBill = labRecordModel.TotalBill;
                         labRecord.PatientId = labRecordModel.PatientId;

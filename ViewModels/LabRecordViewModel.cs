@@ -2023,7 +2023,6 @@ namespace QWellApp.ViewModels
                     Id = SelectedId,
                     PatientId = PatientList.FirstOrDefault(x => x.Value == Patient).Key,
                     ChitNumber = ChitNumber,
-                    AdmitDate = DateTime.Now,
                     TotalBill = TotalBill,
                     OtherCharges = OtherCharges,
                     ConsultantFee = ConsultantFee,
@@ -2413,11 +2412,15 @@ namespace QWellApp.ViewModels
                 Total12 = mediSellingPrice * int.Parse(Dose12);
             }
 
+            var docCommission = !string.IsNullOrWhiteSpace(Doctor) ? DocComm : 0;
+            var nurse1Commission = !string.IsNullOrWhiteSpace(Nurse1) ? Nurse1Comm : 0;
+            var nurse2Commission = !string.IsNullOrWhiteSpace(Nurse2) ? Nurse2Comm : 0;
+
             LabBill = LabTotal1 + LabTotal2 + LabTotal3 + LabTotal4 + LabTotal5 + LabTotal6 + LabTotal7 + LabTotal8 + LabTotal9 + LabTotal10;
             TotalLabPaidCost = LabPaid1 + LabPaid2 + LabPaid3 + LabPaid4 + LabPaid5 + LabPaid6 + LabPaid7 + LabPaid8 + LabPaid9 + LabPaid10;
             QwellCommission = LabBill - TotalLabPaidCost;
             OtherCharges = Total1 + Total2 + Total3 + Total4 + Total5 + Total6 + Total7 + Total8 + Total9 + Total10;
-            TotalBill = LabBill + OtherCharges + ConsultantFee;
+            TotalBill = LabBill + OtherCharges + ConsultantFee + docCommission + nurse1Commission + nurse2Commission;
 
             if (valideUser != null 
                 && (validEmployeeType.Equals(EmployeeTypeEnum.Admin.ToString()) || validEmployeeType.Equals(EmployeeTypeEnum.Manager.ToString()) || validEmployeeType.Equals(EmployeeTypeEnum.Staff.ToString())) 

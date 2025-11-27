@@ -1573,7 +1573,6 @@ namespace QWellApp.ViewModels
                     ProcedureBill = ProcedureBill,
                     OPDCharge = OPDCharge,
                     OtherCharges = OtherCharges,
-                    AdmitDate = AdmitDate,
                     TotalBill = TotalBill,
                     ConsultantFee = ConsultantFee,
                     PatientId = PatientList.FirstOrDefault(x => x.Value == Patient).Key,
@@ -1755,8 +1754,12 @@ namespace QWellApp.ViewModels
                 var mediSellingPrice = productRepository.GetByID(MedicineList.FirstOrDefault(x => x.Value == Med12).Key).SellingPrice;
                 Total12 = mediSellingPrice * int.Parse(Dose12);
             }
+            var docCommission = !string.IsNullOrWhiteSpace(Doctor) ? DocComm : 0;
+            var nurse1Commission = !string.IsNullOrWhiteSpace(Nurse1) ? Nurse1Comm : 0;
+            var nurse2Commission = !string.IsNullOrWhiteSpace(Nurse2) ? Nurse2Comm : 0;
+
             ProcedureBill = Total1 + Total2 + Total3 + Total4 + Total5 + Total6 + Total7 + Total8 + Total9 + Total10 + Total11 + Total12;
-            TotalBill = OPDCharge + ProcedureBill + OtherCharges + ConsultantFee;
+            TotalBill = OPDCharge + ProcedureBill + OtherCharges + ConsultantFee + docCommission + nurse1Commission + nurse2Commission;
 
             if (valideUser != null 
                 && (validEmployeeType.Equals(EmployeeTypeEnum.Admin.ToString()) || validEmployeeType.Equals(EmployeeTypeEnum.Manager.ToString()) || validEmployeeType.Equals(EmployeeTypeEnum.Staff.ToString())) 

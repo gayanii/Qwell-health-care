@@ -3,7 +3,6 @@
                     xmlns:fa="http://schemas.awesome.incremented/wpf/xaml/fontawesome.sharp">
 
     <Style x:Key="CreateUpdateBorderStyle" TargetType="Border">
-        <!--Normal button style-->
         <Setter Property="Background" Value="{StaticResource color8}"/>
         <Setter Property="Padding" Value="10"/>
         <Setter Property="CornerRadius" Value="10"/>
@@ -11,5 +10,12 @@
         <Setter Property="Margin" Value="2"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
     </Style>
+
+  <Style x:Key="TableBorderStyle" TargetType="Border">
+    <Setter Property="Background" Value="{StaticResource panelActiveColor}"/>
+    <Setter Property="Padding" Value="2"/>
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="Margin" Value="0 10"/>
+  </Style>
 
 </ResourceDictionary>

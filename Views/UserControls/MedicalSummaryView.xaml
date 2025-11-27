@@ -81,11 +81,7 @@
                     </Button.Visibility>
                 </Button>
             </Grid>
-            <Border Grid.Row="2"
-                    Background="{StaticResource panelActiveColor}"
-                    CornerRadius="10" 
-                    Padding="5"
-                    Margin="0 10">
+            <Border Grid.Row="2" Style="{StaticResource TableBorderStyle}">
                 <DataGrid
                         Name="SummaryGridMed"
                         CanUserAddRows="False"

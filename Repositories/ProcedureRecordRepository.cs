@@ -154,7 +154,6 @@ namespace QWellApp.Repositories
                         procedureRecord.OPDCharge = procedureRecordModel.OPDCharge;
                         procedureRecord.OtherCharges = procedureRecordModel.OtherCharges;
                         procedureRecord.ProcedureBill = procedureRecordModel.ProcedureBill;
-                        procedureRecord.AdmitDate = procedureRecordModel.AdmitDate;
                         procedureRecord.TotalBill = procedureRecordModel.TotalBill;
                         procedureRecord.ConsultantFee = procedureRecordModel.ConsultantFee;
                         procedureRecord.PatientId = procedureRecordModel.PatientId;
